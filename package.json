@@ -1,0 +1,19 @@
+{
+  "name": "polkadot-http-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@gitee.com:czyczk/polkadot-http-api",
+  "author": "Zenas Chen <czyczk@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@polkadot/api": "6.12.1",
+    "@polkadot/api-contract": "6.12.1",
+    "restify": "^8.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.5.0"
+  },
+  "scripts": {
+    "start": "node main.js"
+  }
+}
