@@ -1,9 +1,9 @@
-import polkadotApi from '@polkadot/api';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiConfig } from './api-config';
 
-export const initApi = async (config: ApiConfig): Promise<polkadotApi.ApiPromise> => {
-	const wsProvider = new polkadotApi.WsProvider(config.nodeURL);
-	const api = new polkadotApi.ApiPromise({ provider: wsProvider });
+export const initApi = async (config: ApiConfig): Promise<ApiPromise> => {
+	const wsProvider = new WsProvider(config.nodeURL);
+	const api = new ApiPromise({ provider: wsProvider });
 	await api.isReady;
 
 	return api;
