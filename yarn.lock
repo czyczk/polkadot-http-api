@@ -1260,6 +1260,11 @@ http-errors@~1.6.2:
     setprototypeof "1.1.0"
     statuses ">= 1.4.0 < 2"
 
+http-method-enum@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmmirror.com/http-method-enum/download/http-method-enum-1.0.0.tgz#fb55ba68320d3c5f6b76991087e16b25c1415a92"
+  integrity sha1-+1W6aDINPF9rdpkQh+FrJcFBWpI=
+
 http-signature@^1.2.0:
   version "1.3.6"
   resolved "https://registry.npmmirror.com/http-signature/download/http-signature-1.3.6.tgz?cache=0&sync_timestamp=1637178646601&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fhttp-signature%2Fdownload%2Fhttp-signature-1.3.6.tgz#cb6fbfdf86d1c974f343be94e87f7fc128662cf9"
