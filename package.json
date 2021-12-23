@@ -11,9 +11,16 @@
     "restify": "^8.6.0"
   },
   "devDependencies": {
-    "eslint": "^8.5.0"
+    "@types/restify": "^8.5.4",
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
+    "@typescript-eslint/parser": "^5.8.0",
+    "eslint": "^8.5.0",
+    "ts-node": "^10.4.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.4"
   },
   "scripts": {
-    "start": "node main.js"
+    "start": "yarn run ts-node src/main.ts",
+    "dev": "yarn run ts-node-dev --respawn src/main.ts"
   }
 }
