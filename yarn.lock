@@ -90,7 +90,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@polkadot/api-contract@6.12.1":
+"@polkadot/api-contract@^6.12.1":
   version "6.12.1"
   resolved "https://registry.npmmirror.com/@polkadot/api-contract/download/@polkadot/api-contract-6.12.1.tgz#7470da45d50304053cd716531d8c9294c8c429d2"
   integrity sha512-Ar4RcEnqdrQLfXiTrME0K8Yl6CP9mQ285Ez2qT3D00l07Xw14RFjVAG2BHQeD0aWipfnvkKqSFiqzXhaItWdiw==
@@ -114,7 +114,7 @@
     "@polkadot/util-crypto" "^8.1.2"
     rxjs "^7.4.0"
 
-"@polkadot/api@6.12.1":
+"@polkadot/api@6.12.1", "@polkadot/api@^6.12.1":
   version "6.12.1"
   resolved "https://registry.npmmirror.com/@polkadot/api/download/@polkadot/api-6.12.1.tgz#685a2727eb532fdacd9b86f9ddf595d58be71ee4"
   integrity sha512-RVdTiA2WaEvproM3i6E9TKS1bfXpPd9Ly9lUG/kVLaspjKoIot9DJUDTl97TJ+7xr8LXGbXqm448Ud0hsEBV8Q==
@@ -364,6 +364,11 @@
   version "17.0.2"
   resolved "https://registry.npmmirror.com/@types/node/download/@types/node-17.0.2.tgz#a4c07d47ff737e8ee7e586fe636ff0e1ddff070a"
   integrity sha512-JepeIUPFDARgIs0zD/SKPgFsJEAF0X5/qO80llx59gOxFTboS9Amv3S+QfB7lqBId5sFXJ99BN0J6zFRvL9dDA==
+
+"@types/node@^17.0.3":
+  version "17.0.3"
+  resolved "https://registry.npmmirror.com/@types/node/download/@types/node-17.0.3.tgz#4b086e316ed4504f49bd78135d48642bf50aa135"
+  integrity sha512-bAKB1GcA28FR/D8HHQ5U4FYk7nvoZdp7TZSy9oIyQ8gpYCzpeESa3LCK2TbeocXic7GwIXCkCItJg0DttO3ZaQ==
 
 "@types/restify@^8.5.4":
   version "8.5.4"
