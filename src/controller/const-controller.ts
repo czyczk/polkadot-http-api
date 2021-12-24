@@ -7,10 +7,8 @@ export class ConstController implements IGroupableController {
 	// The length of an epoch (session) in Babe
 	handleGetBabeEpochDuration = async (req: Request, res: Response, next: Next) => {
 		try {
-			await this.api.isReady;
-			res.send(200, {
-				epochDuration: this.api.consts.babe.epochDuration.toNumber()
-			});
+			await this._api.isReady;
+			res.send(200, this._api.consts.babe.epochDuration.toNumber());
 			next();
 		} catch (err) {
 			console.error(err);
@@ -21,11 +19,9 @@ export class ConstController implements IGroupableController {
 	// The amount required to create a new account
 	handleGetBalancesExistentialDeposit = async (req: Request, res: Response, next: Next) => {
 		try {
-			await this.api.isReady;
-			const result = this.api.consts.balances.existentialDeposit.toNumber();
-			res.send(200, {
-				existentialDeposit: result,
-			});
+			await this._api.isReady;
+			const result = this._api.consts.balances.existentialDeposit.toNumber();
+			res.send(200, result);
 			next();
 		} catch (err) {
 			console.error(err);
@@ -36,11 +32,9 @@ export class ConstController implements IGroupableController {
 	// The amount required per byte on an extrinsic
 	handleGetTransactionPaymentTransactionByteFee = async (req: Request, res: Response, next: Next) => {
 		try {
-			await this.api.isReady;
-			const result = this.api.consts.transactionPayment.transactionByteFee.toNumber();
-			res.send(200, {
-				transactionByteFee: result,
-			});
+			await this._api.isReady;
+			const result = this._api.consts.transactionPayment.transactionByteFee.toNumber();
+			res.send(200, result);
 			next();
 		} catch (err) {
 			console.error(err);
@@ -48,7 +42,7 @@ export class ConstController implements IGroupableController {
 		}
 	};
 
-	constructor(private readonly api: ApiPromise) { }
+	constructor(private readonly _api: ApiPromise) { }
 	prefix = '/api/consts';
 	endpoints = [
 		new Endpoint(HTTPMethod.GET, '/babe/epoch-duration', [this.handleGetBabeEpochDuration]),

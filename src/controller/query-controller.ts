@@ -11,9 +11,7 @@ export class QueryController implements IGroupableController {
 		try {
 			await this._api.isReady;
 			const now = await this._api.query.timestamp.now();
-			res.send(200, {
-				now: now.toJSON(),
-			});
+			res.send(200, now.toJSON());
 			next();
 		} catch (err) {
 			console.error(err);
