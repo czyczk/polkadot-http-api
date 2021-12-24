@@ -1,15 +1,16 @@
 import { Next, Request, Response } from 'restify';
-import { QueryService } from '../service/query-service';
 import errs from 'restify-errors';
 import { Endpoint, IGroupableController } from './model';
 import HTTPMethod from 'http-method-enum';
+import { ApiPromise } from '@polkadot/api';
 
 export class QueryController implements IGroupableController {
-	constructor(private readonly _queryService: QueryService) { }
+	constructor(private readonly _api: ApiPromise) { }
 
 	handleGetNow = async (req: Request, res: Response, next: Next) => {
 		try {
-			const now = await this._queryService.getNow();
+			await this._api.isReady;
+			const now = await this._api.query.timestamp.now();
 			res.send(200, {
 				now: now.toJSON(),
 			});
@@ -28,7 +29,7 @@ export class QueryController implements IGroupableController {
 				return;
 			}
 
-			const result = await this._queryService.getSystemAccount(addr);
+			const result = await this._api.query.system.account(addr);
 			res.send(200, result);
 			next();
 		} catch (err) {

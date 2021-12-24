@@ -7,7 +7,6 @@ import { ServerConfigBuilder } from './app-init/server-config-builder';
 import { initServer } from './app-init/init-server';
 import { ConstController } from './controller/const-controller';
 import { QueryController } from './controller/query-controller';
-import { QueryService } from './service/query-service';
 
 // Init API
 (async () => {
@@ -19,7 +18,7 @@ import { QueryService } from './service/query-service';
 		.withPort(8080)
 		.withController(new PingController())
 		.withController(new ConstController(api))
-		.withController(new QueryController(new QueryService(api)))
+		.withController(new QueryController(api))
 		.getConfig();
 	const server = initServer(serverConfig);
 	//server.get('/genesis-hash', testNodeConnection);
