@@ -370,6 +370,13 @@
   resolved "https://registry.npmmirror.com/@types/node/download/@types/node-17.0.3.tgz#4b086e316ed4504f49bd78135d48642bf50aa135"
   integrity sha512-bAKB1GcA28FR/D8HHQ5U4FYk7nvoZdp7TZSy9oIyQ8gpYCzpeESa3LCK2TbeocXic7GwIXCkCItJg0DttO3ZaQ==
 
+"@types/restify-errors@^4.3.4":
+  version "4.3.4"
+  resolved "https://registry.npmmirror.com/@types/restify-errors/download/@types/restify-errors-4.3.4.tgz#e7830098c891e9dc91f24b7cd41c0e5d79246730"
+  integrity sha1-54MAmMiR6dyR8kt81BwOXXkkZzA=
+  dependencies:
+    "@types/verror" "*"
+
 "@types/restify@^8.5.4":
   version "8.5.4"
   resolved "https://registry.npmmirror.com/@types/restify/download/@types/restify-8.5.4.tgz#7c56ec8ddce0e8541d9ed476901e51efe798bbaa"
@@ -396,6 +403,11 @@
   version "0.0.30"
   resolved "https://registry.npm.taobao.org/@types/strip-json-comments/download/@types/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha1-mqMMBNshKpoGSdaub9UKzMQHSKE=
+
+"@types/verror@*":
+  version "1.10.5"
+  resolved "https://registry.npmmirror.com/@types/verror/download/@types/verror-1.10.5.tgz#2a1413aded46e67a1fe2386800e291123ed75eb1"
+  integrity sha1-KhQTre1G5nof4jhoAOKREj7XXrE=
 
 "@types/websocket@^1.0.4":
   version "1.0.4"
@@ -1751,7 +1763,7 @@ resolve@^1.0.0:
 
 restify-errors@^8.0.2:
   version "8.0.2"
-  resolved "https://registry.npm.taobao.org/restify-errors/download/restify-errors-8.0.2.tgz#0b9678738e37888e4fefe52aa6ee92771ec954e9"
+  resolved "https://registry.nlark.com/restify-errors/download/restify-errors-8.0.2.tgz#0b9678738e37888e4fefe52aa6ee92771ec954e9"
   integrity sha1-C5Z4c443iI5P7+Uqpu6Sdx7JVOk=
   dependencies:
     "@netflix/nerror" "^1.0.0"
