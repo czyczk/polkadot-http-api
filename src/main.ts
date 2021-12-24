@@ -7,6 +7,7 @@ import { ServerConfigBuilder } from './app-init/server-config-builder';
 import { initServer } from './app-init/init-server';
 import { ConstController } from './controller/const-controller';
 import { QueryController } from './controller/query-controller';
+import { RPCController } from './controller/rpc-controller';
 
 // Init API
 (async () => {
@@ -19,6 +20,7 @@ import { QueryController } from './controller/query-controller';
 		.withController(new PingController())
 		.withController(new ConstController(api))
 		.withController(new QueryController(api))
+		.withController(new RPCController(api))
 		.getConfig();
 	const server = initServer(serverConfig);
 	//server.get('/genesis-hash', testNodeConnection);
