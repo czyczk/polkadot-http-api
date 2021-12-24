@@ -4,7 +4,7 @@ import { Endpoint, IGroupableController } from './model';
 
 export class PingController implements IGroupableController {
 	handlePing = (req: Request, res: Response, next: Next) => {
-		res.send('pong');
+		res.send(200, 'pong');
 		next();
 	};
 

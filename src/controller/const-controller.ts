@@ -8,7 +8,7 @@ export class ConstController implements IGroupableController {
 	handleGetBabeEpochDuration = async (req: Request, res: Response, next: Next) => {
 		try {
 			await this.api.isReady;
-			res.send({
+			res.send(200, {
 				epochDuration: this.api.consts.babe.epochDuration.toNumber()
 			});
 			next();
@@ -23,7 +23,7 @@ export class ConstController implements IGroupableController {
 		try {
 			await this.api.isReady;
 			const result = this.api.consts.balances.existentialDeposit.toNumber();
-			res.send({
+			res.send(200, {
 				existentialDeposit: result,
 			});
 			next();
@@ -38,7 +38,7 @@ export class ConstController implements IGroupableController {
 		try {
 			await this.api.isReady;
 			const result = this.api.consts.transactionPayment.transactionByteFee.toNumber();
-			res.send({
+			res.send(200, {
 				transactionByteFee: result,
 			});
 			next();
