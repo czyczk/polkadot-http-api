@@ -1,37 +1,33 @@
-# polkadot-http-api
+# Polkadot HTTP API
 
-#### 介绍
-An HTTP wrapper for Polkadot JS API. Useful for languages that cannot easily call Javascript functions. APIs exposed in RESTful style.
+## Description
+An HTTP wrapper for Polkadot JS API. Useful for languages that cannot easily call Javascript functions. APIs are arranged in a similar way as the original Polkladot JS APIs.
 
-#### 软件架构
-软件架构说明
+## Instructions
 
+1.  `yarn install`
+2.  `yarn start` to start the HTTP server or
+3.  `yarn dev` to start the HTTP server in dev mode so that it will restart automatically when the code changes
 
-#### 安装教程
+## Supported APIs
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+The following list shows the mapping from the original Polkadot JS APIs to the HTTP APIs provided by this program.
 
-#### 使用说明
+Note that the parameters indicate only the query strings after "?" mark in GET requests and the params in POST forms. The parameters in the path are included in the endpoints.  
+For example, in the entry which has an endpoint of `/api/query/system/account/:addr` and a parameter list of `at` actually mentions 2 parameters: `addr` in the path and `at` in the parameter ilst. The meaning of the parameters is documented in the Polkadot JS API documentation.
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+The column of Polkadot JS API is sorted in alphabetical order (except the ping APIs).
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+|Polkadot JS API|HTTP Method|HTTP Endpoint|Parameters|
+|-|-|-|-|
+|N/A|GET|`/api/ping`||
+|`at.query.system.account` or `query.system.account.at` (deprecated)|GET|`/api/query/system/account/:addr`|`at`|
+|`at.query.timestamp.now` or `query.timestamp.now.at` (deprecated)|GET|`/api/query/timestamp/now`|`at`|
+|`consts.babe.epochDuration`|GET|`/api/consts/babe/epoch-duration`||
+|`consts.balances.existentialDeposit`|GET|`/api/consts/balances/existential-deposit`||
+|`consts.transactionPayment.transactionByteFee`|GET|`/api/consts/transaction-payment/transaction-byte-fee`||
+|`query.staking.validators.keys`|GET|`/api/query/staking/validators/keys`||
+|`query.system.account`|GET|`/api/query/system/account/:addr`||
+|`query.timestamp.now`|GET|`/api/query/timestamp/now`||
+|`rpc.chain.getHeader`|GET|`/api/rpc/chain/header`||
+|`rpc.system.chain`|GET|`/api/rpc/system/chain`||
