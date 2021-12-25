@@ -1,3 +1,4 @@
+import { RequestHandler } from 'restify';
 import { IGroupableController } from '../controller/model';
 import { ServerConfig } from './server-config';
 
@@ -10,6 +11,11 @@ export class ServerConfigBuilder {
 		}
 
 		this._config.port = `${port}`;
+		return this;
+	};
+
+	withPlugin = (plugin: RequestHandler): this => {
+		this._config.plugins.add(plugin);
 		return this;
 	};
 
