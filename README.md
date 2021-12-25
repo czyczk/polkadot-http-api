@@ -14,7 +14,8 @@ An HTTP wrapper for Polkadot JS API. Useful for languages that cannot easily cal
 The following list shows the mapping from the original Polkadot JS APIs to the HTTP APIs provided by this program.
 
 Note that the parameters indicate only the query strings after "?" mark in GET requests and the params in POST forms. The parameters in the path are included in the endpoints.  
-For example, in the entry which has an endpoint of `/api/query/system/account/:addr` and a parameter list of `at` actually mentions 2 parameters: `addr` in the path and `at` in the parameter ilst. The meaning of the parameters is documented in the Polkadot JS API documentation.
+For example, in the entry which has an endpoint of `/api/query/system/account/:addr` and a parameter list of `at`, 2 parameters are actually mentioned: `addr` in the path and `at` in the parameter ilst.  
+The names of the parameters are kept the same as in the Polkadot JS APIs. So you can refer to the Polkadot JS API documentation for explanations.
 
 The column of Polkadot JS API is sorted in alphabetical order (except the ping APIs).
 
