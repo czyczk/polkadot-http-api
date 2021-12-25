@@ -1,4 +1,4 @@
-import { Next, Request, Response } from 'restify';
+import restify from 'restify';
 import { ApiPromise } from '@polkadot/api';
 import { PingController } from './controller/ping-controller';
 import { initApi } from './app-init/init-api';
@@ -17,6 +17,7 @@ import { RPCController } from './controller/rpc-controller';
 	// Init server
 	const serverConfig = new ServerConfigBuilder()
 		.withPort(8080)
+		.withPlugin(restify.plugins.queryParser({ mapParams: false }))
 		.withController(new PingController())
 		.withController(new ConstController(api))
 		.withController(new QueryController(api))
