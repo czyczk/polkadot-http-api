@@ -1,7 +1,8 @@
 import { ApiPromise } from '@polkadot/api';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
-import { Endpoint, IGroupableController } from './model';
+
+import { Endpoint, IGroupableController } from '../model';
 
 export class ConstController implements IGroupableController {
 	// The length of an epoch (session) in Babe

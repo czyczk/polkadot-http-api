@@ -1,6 +1,7 @@
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
-import { Endpoint, IGroupableController } from './model';
+
+import { Endpoint, IGroupableController } from '../model';
 
 export class PingController implements IGroupableController {
 	handlePing = (req: Request, res: Response, next: Next) => {
@@ -8,7 +9,7 @@ export class PingController implements IGroupableController {
 		next();
 	};
 
-	prefix = '/api/ping';
+	prefix = '/ping';
 	endpoints = [
 		new Endpoint(HTTPMethod.GET, '', [this.handlePing]),
 	];

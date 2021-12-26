@@ -1,39 +1,41 @@
 import restify from 'restify';
-import { ApiPromise } from '@polkadot/api';
-import { PingController } from './controller/ping-controller';
-import { initApi } from './app-init/init-api';
+
 import { ApiConfigBuilder } from './app-init/api-config-builder';
-import { ServerConfigBuilder } from './app-init/server-config-builder';
+import { initApi } from './app-init/init-api';
 import { initServer } from './app-init/init-server';
-import { ConstController } from './controller/const-controller';
-import { QueryController } from './controller/query-controller';
-import { RPCController } from './controller/rpc-controller';
+import { ServerConfigBuilder } from './app-init/server-config-builder';
+import { ConstController } from './controller/api/const-controller';
+import { PingController } from './controller/api/ping-controller';
+import { QueryController } from './controller/api/query-controller';
+import { RPCController } from './controller/api/rpc-controller';
+import { TopLevelController as ApiTopLevelController } from './controller/api/top-level-controller';
+import { TxController } from './controller/api/tx-controller';
+import { TopLevelController as KeyringTopLevelController } from './controller/keyring/top-level-controller';
 
 // Init API
 (async () => {
-	const apiConfig = new ApiConfigBuilder().withNodeURL('ws://localhost:9944').getConfig();
-	const api = await initApi(apiConfig);
+	const apiConfig = new ApiConfigBuilder()
+		.withNodeURL('ws://localhost:9944')
+		.withKeyringType('sr25519')
+		.getConfig();
+	const { api, keyring } = await initApi(apiConfig);
 
 	// Init server
 	const serverConfig = new ServerConfigBuilder()
 		.withPort(8080)
 		.withPlugin(restify.plugins.queryParser({ mapParams: false }))
+		.withPlugin(restify.plugins.bodyParser())
 		.withController(new PingController())
+		.withController(new ApiTopLevelController(api))
 		.withController(new ConstController(api))
 		.withController(new QueryController(api))
 		.withController(new RPCController(api))
+		.withController(new TxController(api, keyring))
+		.withController(new KeyringTopLevelController(api, keyring))
 		.getConfig();
 	const server = initServer(serverConfig);
-	//server.get('/genesis-hash', testNodeConnection);
 
 	server.listen(serverConfig.port, () => {
 		console.log('%s listening at %s', server.name, server.url);
 	});
 })();
-
-//async function testNodeConnection(req: Request, res: Response, next: Next) {
-//	await api.isReady;
-//	const genesisHash = api.genesisHash.toHex();
-//	res.send(genesisHash);
-//	next();
-//}

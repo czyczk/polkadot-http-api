@@ -1,4 +1,4 @@
-import { RequestHandler } from 'restify';
+import { RequestHandlerType } from 'restify';
 import { IGroupableController } from '../controller/model';
 
 export class ServerConfig {
@@ -10,7 +10,7 @@ export class ServerConfig {
 		this._port = value;
 	}
 
-	private _plugins = new Set<RequestHandler>();
+	private _plugins = new Set<RequestHandlerType>();
 	public get plugins() {
 		return this._plugins;
 	}

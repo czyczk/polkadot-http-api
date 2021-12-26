@@ -1,4 +1,5 @@
-import { RequestHandler } from 'restify';
+import { RequestHandlerType } from 'restify';
+
 import { IGroupableController } from '../controller/model';
 import { ServerConfig } from './server-config';
 
@@ -14,7 +15,7 @@ export class ServerConfigBuilder {
 		return this;
 	};
 
-	withPlugin = (plugin: RequestHandler): this => {
+	withPlugin = (plugin: RequestHandlerType): this => {
 		this._config.plugins.add(plugin);
 		return this;
 	};

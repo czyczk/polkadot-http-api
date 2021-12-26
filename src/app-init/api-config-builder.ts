@@ -1,3 +1,5 @@
+import { KeypairType } from '@polkadot/util-crypto/types';
+
 import { ApiConfig } from './api-config';
 
 export class ApiConfigBuilder {
@@ -5,6 +7,11 @@ export class ApiConfigBuilder {
 
 	withNodeURL = (nodeURL: string): this => {
 		this._config.nodeURL = nodeURL;
+		return this;
+	};
+
+	withKeyringType = (keyringType: KeypairType): this => {
+		this._config.keyringType = keyringType;
 		return this;
 	};
 
