@@ -5,7 +5,7 @@ import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import errs, { InternalError } from 'restify-errors';
 
-import { Endpoint, IGroupableController } from '../model';
+import { Endpoint, IGroupableController, TxExecutionResult } from '../model';
 
 export class TxController implements IGroupableController {
 	constructor(private readonly _api: ApiPromise, private readonly _keyring: Keyring) { }
@@ -37,32 +37,39 @@ export class TxController implements IGroupableController {
 			await this._api.isReady;
 			let inBlockBlockHash: Hash;
 			let finalizedBlockHash: Hash;
-			const unsub = await this._api.tx.balances
-				.transfer(transferDest, transferValue)
-				.signAndSend(signerAccount, (result: ISubmittableResult) => {
-					if (result.status.isInBlock) {
-						inBlockBlockHash = result.status.asInBlock;
 
-						if (unsubIfInBlock) {
-							unsub();
-							const ret = new TxExecutionResult(inBlockBlockHash);
-							res.send(200, ret);
-							next();
-						}
-					} else if (result.status.isFinalized) {
-						finalizedBlockHash = result.status.asFinalized;
+			const extrinsic = this._api.tx.balances
+				.transfer(transferDest, transferValue);
+			const extrinsicHash = extrinsic.hash.toHex();
+
+			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
+				if (result.status.isInBlock) {
+					inBlockBlockHash = result.status.asInBlock;
+
+					if (unsubIfInBlock) {
 						unsub();
-						const ret = new TxExecutionResult(inBlockBlockHash, finalizedBlockHash);
+						const ret = new TxExecutionResult(extrinsicHash, inBlockBlockHash);
 						res.send(200, ret);
 						next();
-					} else if (result.status.isDropped) {
-						unsub();
-						next(new InternalError('Transaction dropped.'));
-					} else if (result.status.isFinalityTimeout) {
-						unsub();
-						next(new InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
+						return;
 					}
-				});
+				} else if (result.status.isFinalized) {
+					finalizedBlockHash = result.status.asFinalized;
+					unsub();
+					const ret = new TxExecutionResult(extrinsicHash, inBlockBlockHash, finalizedBlockHash);
+					res.send(200, ret);
+					next();
+					return;
+				} else if (result.status.isDropped) {
+					unsub();
+					next(new InternalError('Transaction dropped.'));
+					return;
+				} else if (result.status.isFinalityTimeout) {
+					unsub();
+					next(new InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
+					return;
+				}
+			});
 		} catch (err) {
 			console.error(err);
 			next(err);
@@ -73,8 +80,4 @@ export class TxController implements IGroupableController {
 	endpoints = [
 		new Endpoint(HTTPMethod.POST, '/balances/transfer', [this.handlePostBlancesTransferWithSubscription]),
 	];
-}
-
-export class TxExecutionResult {
-	constructor(public inBlockBlockHash: Hash, public finalizedBlockHash?: Hash) { }
 }

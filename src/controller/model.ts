@@ -1,3 +1,4 @@
+import { Hash } from '@polkadot/types/interfaces';
 import HTTPMethod from 'http-method-enum';
 import restify from 'restify';
 
@@ -32,4 +33,8 @@ export class Endpoint {
 		this._url = url;
 		this._handlers = handlers;
 	}
+}
+
+export class TxExecutionResult {
+	constructor(public txHash: string, public inBlockBlockHash: Hash, public finalizedBlockHash?: Hash) { }
 }
