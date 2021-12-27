@@ -1,0 +1,114 @@
+{
+	"source": {
+		"hash": "0x26c66434124f8bab1b8da86361b4e1562a712340ca0a3ab7f10cbdbd6080dfbd",
+		"language": "ink! 3.0.0-rc7",
+		"compiler": "rustc 1.59.0-nightly"
+	},
+	"contract": {
+		"name": "flipper",
+		"version": "0.1.0",
+		"authors": [
+			"[your_name] <[your_email]>"
+		]
+	},
+	"V1": {
+		"spec": {
+			"constructors": [
+				{
+					"args": [
+						{
+							"name": "init_value",
+							"type": {
+								"displayName": [
+									"bool"
+								],
+								"type": 0
+							}
+						}
+					],
+					"docs": [
+						"Constructor that initializes the `bool` value to the given `init_value`."
+					],
+					"name": [
+						"new"
+					],
+					"selector": "0x9bae9d5e"
+				},
+				{
+					"args": [],
+					"docs": [
+						"Constructor that initializes the `bool` value to `false`.",
+						"",
+						"Constructors can delegate to other constructors."
+					],
+					"name": [
+						"default"
+					],
+					"selector": "0xed4b9d1b"
+				}
+			],
+			"docs": [],
+			"events": [],
+			"messages": [
+				{
+					"args": [],
+					"docs": [
+						" A message that can be called on instantiated contracts.",
+						" This one flips the value of the stored `bool` from `true`",
+						" to `false` and vice versa."
+					],
+					"mutates": true,
+					"name": [
+						"flip"
+					],
+					"payable": false,
+					"returnType": null,
+					"selector": "0x633aa551"
+				},
+				{
+					"args": [],
+					"docs": [
+						" Simply returns the current value of our `bool`."
+					],
+					"mutates": false,
+					"name": [
+						"get"
+					],
+					"payable": false,
+					"returnType": {
+						"displayName": [
+							"bool"
+						],
+						"type": 0
+					},
+					"selector": "0x2f865bd9"
+				}
+			]
+		},
+		"storage": {
+			"struct": {
+				"fields": [
+					{
+						"layout": {
+							"cell": {
+								"key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+								"ty": 0
+							}
+						},
+						"name": "value"
+					}
+				]
+			}
+		},
+		"types": [
+			{
+				"id": 0,
+				"type": {
+					"def": {
+						"primitive": "bool"
+					}
+				}
+			}
+		]
+	}
+}
