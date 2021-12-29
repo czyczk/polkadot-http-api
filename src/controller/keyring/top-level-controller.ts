@@ -10,14 +10,18 @@ export class TopLevelController implements IGroupableController {
 
 	handlePostAddFromUri = async (req: Request, res: Response, next: Next) => {
 		try {
+			// Required params
 			const phrase = req.body.phrase;
 			if (!phrase) {
 				next(new errs.BadRequestError('Param `phrase` not specified.'));
 				return;
 			}
 
-			// `meta` should be a JSON object. If it's from a POST form, it'll appear as a string, parse it to a JSON object.
+			// Optional params
 			let meta = req.body.meta;
+
+			// Process the params
+			// `meta` should be a JSON object. If it's from a POST form, it'll appear as a string, parse it to a JSON object.
 			if (meta && typeof (meta) === 'string') {
 				meta = JSON.parse(meta);
 			}

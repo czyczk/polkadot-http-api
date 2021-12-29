@@ -6,12 +6,14 @@ import { Next, Request, Response } from 'restify';
 import errs, { InternalError } from 'restify-errors';
 
 import { Endpoint, IGroupableController, InBlockStatus, TxExecutionResult } from '../model';
+import { DEFAULT_UNSUB_IF_IN_BLOCK } from './default-optional-params';
 
 export class TxController implements IGroupableController {
 	constructor(private readonly _api: ApiPromise, private readonly _keyring: Keyring) { }
 
 	handlePostBlancesTransferWithSubscription = async (req: Request, res: Response, next: Next) => {
 		try {
+			// Required params
 			const transferDest = req.body.transferDest;
 			if (!transferDest) {
 				next(new errs.BadRequestError('Param `transferDest` not specified.'));
@@ -30,10 +32,16 @@ export class TxController implements IGroupableController {
 				return;
 			}
 
-			const unsubIfInBlock: boolean = req.body.unsubIfInBlock;
+			// Optional params
+			let unsubIfInBlock = DEFAULT_UNSUB_IF_IN_BLOCK;
+			if (req.body.unsubIfInBlock === false) {
+				unsubIfInBlock = false;
+			}
 
+			// Process the params
 			const signerAccount = this._keyring.getPair(signerAddress);
 
+			// Mess with API calls
 			await this._api.isReady;
 			let inBlockBlockHash: Hash;
 			let finalizedBlockHash: Hash;
