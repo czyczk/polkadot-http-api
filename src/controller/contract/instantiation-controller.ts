@@ -15,7 +15,7 @@ import {
 	DEFAULT_CONTRACT_INSTANTIATION_VALUE,
 	DEFAULT_UNSUB_IF_IN_BLOCK,
 } from './default-optional-params';
-import { loadAbi, loadWasm } from './example-contract/util';
+import { loadExampleAbi, loadExampleWasm } from './example-contract/util';
 import { ContractInstantiationErrorResult, ContractInstantiationSuccessResult, ExplainedDispatchError } from './model';
 
 export class InstantiationController implements IGroupableController {
@@ -31,8 +31,8 @@ export class InstantiationController implements IGroupableController {
 			let finalizedBlockHash: Hash;
 			let address: AccountId;
 
-			const abi = loadAbi();
-			const wasm = loadWasm();
+			const abi = loadExampleAbi();
+			const wasm = loadExampleWasm();
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({
@@ -129,8 +129,8 @@ export class InstantiationController implements IGroupableController {
 			let finalizedBlockHash: Hash;
 			let address: AccountId;
 
-			const abi = loadAbi();
-			const wasm = loadWasm();
+			const abi = loadExampleAbi();
+			const wasm = loadExampleWasm();
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({});
@@ -274,7 +274,11 @@ export class InstantiationController implements IGroupableController {
 
 			// `ctorArgs` should be a JSON array. If it's from a POST form, it'll appear as a string, parse it to a JSON array.
 			if (typeof (ctorArgs) === 'string') {
-				ctorArgs = JSON.parse(ctorArgs);
+				try {
+					ctorArgs = JSON.parse(ctorArgs);
+				} catch (_) {
+					next(new errs.BadRequestError('`ctorArgs` is not a valid JSON string.'));
+				}
 			}
 			if (!Array.isArray(ctorArgs)) {
 				next(new errs.BadRequestError('`ctorArgs` should be an array.'));

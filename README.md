@@ -48,6 +48,7 @@ The column of Polkadot JS API is sorted in alphabetical order (except the ping A
 |`api.runtimeVersion`|GET|`/api/runtime-version`|||
 |`api.tx.balances.transfer`|POST|`/api/tx/balances/transfer`|`transferDest: string`, `transferValue: number`, `signerAddress: string`|`unsubIfInBlock: boolean`|
 |`code.tx.<constructor>`|POST|`/contract/from-code`|`abi`, `wasm`, `signerAddress`, `ctorFuncName`, `ctorArgs`|`gasLimit`, `salt`, `value`, `unsubIfInBlock`|
+|`contract.query.<funcName>`|GET|`/contract/query`|`abi`, `contractAddress`, `callerAddress`, `funcName`, `funcArgs`|`gasLimit`|
 |`keyring.addFromUri`|POST|`/keyring/from-uri`|`phrase`|`meta`|
 |`keyring.getPair`|GET|`/keyring/pair/:address`|||
 
@@ -60,7 +61,7 @@ HTTP endpoint: `/api/tx/balances/transfer`
 Required parameters:  
 - `transferDest: string`: The address of the transfer destination. Can be in the form of any address type supported by Polkadot JS API.
 - `transferValue: number`: The transfer value.
-- `signerAddress: string`: The address of the transfer source, who also acts as the transaction signer. Can be in the form of any address type supported by Polkadot JS API. The signer must have been added to the API beforehand. If not, call `keyring.addFromUri` first.
+- `signerAddress: string`: The address of the transfer source, who also acts as the transaction signer. Can be in the form of any address type supported by Polkadot JS API. The signer must has been added to the API beforehand. If not, call `keyring.addFromUri` first.
 
 Optional parameters:
 - `unsubIfInBlock: boolean`: Default to `true`. Stop the subscription that listens on transaction status changes once the transaction is in block. In this way, you won't be informed if the transaction is not finalized, but in return you can get the result earlier.
@@ -76,7 +77,7 @@ Description: Instantiate a new contract from code that hasn't been uploaded onto
 Required parameters:
 - `abi: string | JSON`: The contents of the contract ABI. In most cases, it refers to the contents of file `metadata.json` in the contract directory.
 - `wasm: file`: The WASM binary of the contract. Should be provided through a POST form multipart file.
-- `signerAddress: string`: The address of the transfer source, who also acts as the transaction signer. Can be in the form of any address type supported by Polkadot JS API. The signer must have been added to the API beforehand. If not, call `keyring.addFromUri` first.
+- `signerAddress: string`: The address of the transfer source, who also acts as the transaction signer. Can be in the form of any address type supported by Polkadot JS API. The signer must has been added to the API beforehand. If not, call `keyring.addFromUri` first.
 - `ctorFuncName: string`: The function name of the constructor you want to call to instantiate the contract. Refer to the ABI for it. It's usually `default` or `new`.
 - `ctorArgs: string | Array`: The arguments for the constructor. Should be an array in JSON form. If no arguments should be provided, leave it as `[]`.
 
@@ -88,6 +89,24 @@ Optional parameters:
 
 Return value:  
 See "[Contract Instantiation Result](#contract-instantiation-result)" section.
+
+**`contract.query.<funcName>`**
+
+HTTP method: GET  
+HTTP endpoint: `/contract/from-code`  
+Description: Query a contract through its function.  
+Required parameters:  
+- `abi: string | JSON`: The contents of the contract ABI. In most cases, it refers to the contents of file `metadata.json` in the contract directory.
+- `contractAddress: string`: The address of the contract to be called. Can be in the form of any address type supported by Polkadot JS API. The address should be able to represent an instantiated contract instance.
+- `callerAddress: string`: The address of the query caller. Can be in the form of any address type supported by Polkadot JS API. The caller must has been added to the API beforehand. If not, call `keyring.addFromUri` first.
+- `funcName: string`: The contract function name.
+- `funcArgs: string | Array`: The arguments for the function. Should be an array in JSON form. If no arguments should be provided, leave it as `[]`.
+
+Optional parameters:  
+- `gasLimit: number`: Default to `-1` (max gas limit).
+
+Return value:  
+See "[Contract Query Result](#contract-query-result)" section.
 
 
 ## Transaction Execution Result
@@ -149,7 +168,7 @@ It contains not only the info of a common transaction execution result (see [Com
 
 If a contract instantiation fails, the return value is of type `ContractInstantiationErrorResult`.
 
-It contains not only the info of a common transaction execution result (see [Common Transaction Execution Result](#common-transaction-execution-result)), but also the the error codes and descriptions. An example is as below:
+It contains not only the info of a common transaction execution result (see [Common Transaction Execution Result](#common-transaction-execution-result)), but also the error codes and descriptions. An example is as below:
 
 ```
 {
@@ -172,3 +191,39 @@ It contains not only the info of a common transaction execution result (see [Com
 
 ```
 
+### Contract Query Result
+
+This section describes the return value of a contract query.
+
+Model class: [`ContractQuerySuccessResult`](./src/controller/contract/model.ts#29) and [`ContractQueryErrorResult`](./src/controller/contract/model.ts#36).
+
+**A successful query:**
+
+If a contract query is successful, the return value is of type `ContractQuerySuccessResult`.
+
+It contains the gas consumed and the output from the called contract function. An example is as below:
+
+```
+{
+    "gasConsumed": 133468830,
+    "output": false
+}
+```
+
+**A failed query:**
+
+If a contract query is successful, the return value is of type `ContractQueryErrorResult`.
+
+It contains the gas consumed and the error codes and descriptions. An example is as below:
+
+```
+{
+    "gasConsumed": 0,
+    "explainedDispatchError": {
+        "index": "0x08",
+        "error": "0x07",
+        "type": "contracts.ContractNotFound",
+        "details": " No contract was found at the specified address."
+    }
+}
+```

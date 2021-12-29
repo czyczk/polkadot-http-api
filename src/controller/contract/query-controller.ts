@@ -1,50 +1,194 @@
 import { ApiPromise, Keyring, SubmittableResult } from '@polkadot/api';
 import { ISubmittableResult } from '@polkadot/types/types';
-import { CodePromise } from '@polkadot/api-contract';
+import { CodePromise, ContractPromise } from '@polkadot/api-contract';
 import { BlueprintSubmittableResult } from '@polkadot/api-contract/base/Blueprint';
 import { Hash } from '@polkadot/types/interfaces';
 import fs from 'fs';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
-import { InternalError } from 'restify-errors';
+import errs from 'restify-errors';
+import BN from 'bn.js';
 
 import { Endpoint, IGroupableController, TxExecutionResult } from '../model';
+import { loadExampleAbi } from './example-contract/util';
+import { DEFAULT_CONTRACT_QUERY_GAS_LIMIT, DEFAULT_CONTRACT_QUERY_VALUE } from './default-optional-params';
+import { ContractQueryErrorResult, ContractQuerySuccessResult, ExplainedDispatchError } from './model';
 
 export class QueryController implements IGroupableController {
-	constructor(private readonly _api: ApiPromise, private readonly _keyring: Keyring) { }
+	constructor(private readonly _api: ApiPromise) { }
 
-	private readonly _abi = fs.readFileSync('./src/controller/contract/example-contract/metadata.json').toString();
-	private readonly _wasm = fs.readFileSync('./src/controller/contract/example-contract/flipper.wasm');
-
-	handleGetGet = async (req: Request, res: Response, next: Next) => {
+	private handleTestQueryGetShouldSucceed = async (req: Request, res: Response, next: Next) => {
 		try {
-			const signerAccount = this._keyring.getPair('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+			const abi = loadExampleAbi();
+			const address = '5G4gQtoM8aihMBnt7DmJS7aQfh3NjC54NhXLRqKPdsKu8F2H';
+			const callerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 
 			await this._api.isReady;
-			let inBlockBlockHash: Hash;
+			const contract = new ContractPromise(this._api, abi, address);
+			const value = DEFAULT_CONTRACT_QUERY_VALUE;
+			const gasLimit = 3_000_000_000;
 
-			const code = new CodePromise(this._api, this._abi, this._wasm);
-			const extrinsic = code.tx['default']({
-				gasLimit: 200000000000,
-				salt: null,
-				value: 1000000000000000,
+			const callOutcome = await contract.query.get(callerAddress, {
+				gasLimit: gasLimit,
+				value: value,
 			});
-			const unsub = await extrinsic.signAndSend(signerAccount, (result: SubmittableResult) => {
-				if (result.status.isInBlock) {
-					inBlockBlockHash = result.status.asInBlock;
-					unsub();
 
-					//if (!result.contract) {
-					//	next(new InternalError('Cannot get `contract` object from `BlueprintSubmittableResult`.'));
-					//	return;
-					//}
-					//const contract = result.contract;
-
-					//const ret = new ContractInitializationResult(contract.address, extrinsic.hash.toHex(), inBlockBlockHash);
-					const ret = result.toHuman(true);
-					res.send(200, ret);
+			if (callOutcome.result.isOk) {
+				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+				res.send(200, ret);
+				next();
+			} else {
+				const queryError = callOutcome.result.asErr;
+				if (!queryError.isModule) {
+					// TODO: Cannot handle non module errors yet.
+					throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
 				}
+
+				// Get the explanation for the error
+				const moduleError = queryError.asModule;
+				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+
+				const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+				res.send(500, ret);
+				next();
+			}
+		} catch (err) {
+			console.error(err);
+			next(err);
+		}
+	};
+
+	private handleTestQueryGetShouldFail = async (req: Request, res: Response, next: Next) => {
+		try {
+			const abi = loadExampleAbi();
+			const address = '5Cp5e1C38HtsBB4mnRFgidzxSJu3KZQLXjnrmwH4jLMEK8Lw'; // Non-existent contract address
+			const callerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+
+			await this._api.isReady;
+			const contract = new ContractPromise(this._api, abi, address);
+			const value = DEFAULT_CONTRACT_QUERY_VALUE;
+			const gasLimit = 3_000_000_000;
+
+			const callOutcome = await contract.query.get(callerAddress, {
+				gasLimit: gasLimit,
+				value: value,
 			});
+
+			if (callOutcome.result.isOk) {
+				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+				res.send(200, ret);
+				next();
+			} else {
+				const queryError = callOutcome.result.asErr;
+				if (!queryError.isModule) {
+					// TODO: Cannot handle non module errors yet.
+					throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
+				}
+
+				// Get the explanation for the error
+				const moduleError = queryError.asModule;
+				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+
+				const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+				res.send(500, ret);
+				next();
+			}
+		} catch (err) {
+			console.error(err);
+			next(err);
+		}
+	};
+
+	handleGetQuery = async (req: Request, res: Response, next: Next) => {
+		try {
+			// Required params
+			const abi = req.query.abi;
+			if (!abi) {
+				next(new errs.BadRequestError('Param `abi` not specified.'));
+				return;
+			}
+
+			const contractAddress = req.query.contractAddress;
+			if (!contractAddress) {
+				next(new errs.BadRequestError('Param `contractAddress` not specified.'));
+				return;
+			}
+
+			const callerAddress = req.query.callerAddress;
+			if (!callerAddress) {
+				next(new errs.BadRequestError('Param `callerAddress` not specified.'));
+				return;
+			}
+
+			const funcName = req.query.funcName;
+			if (!funcName) {
+				next(new errs.BadRequestError('Param `funcName` not specified.'));
+				return;
+			}
+
+			let funcArgs = req.query.funcArgs;
+			if (!funcArgs) {
+				next(new errs.BadRequestError('Param `funcArgs` not specified.'));
+				return;
+			}
+
+			// Optional params
+			let gasLimit = DEFAULT_CONTRACT_QUERY_GAS_LIMIT;
+			if (req.query.gasLimit) {
+				gasLimit = req.query.gasLimit;
+			}
+
+			// Process the params
+			// `funcArgs` should be a JSON array. Since it's from the GET query, it'll appear as a string, parse it to a JSON array.
+			if (typeof (funcArgs) === 'string') {
+				try {
+					funcArgs = JSON.parse(funcArgs);
+				} catch (_) {
+					next(new errs.BadRequestError('`funcArgs` is not a valid JSON string.'));
+				}
+			}
+			if (!Array.isArray(funcArgs)) {
+				next(new errs.BadRequestError('`funcArgs` should be an array.'));
+				return;
+			}
+
+			// Do API calls
+			await this._api.isReady;
+			const contract = new ContractPromise(this._api, abi, contractAddress);
+			const value = DEFAULT_CONTRACT_QUERY_VALUE;
+
+			// Make sure the function exists
+			if (!contract.query[funcName]) {
+				next(new errs.BadRequestError(`No function named "${funcName}".`));
+				return;
+			}
+			const callOutcome = await contract.query[funcName](callerAddress, {
+				gasLimit: gasLimit,
+				value: value,
+			}, ...funcArgs);
+
+			if (callOutcome.result.isOk) {
+				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+				res.send(200, ret);
+				next();
+			} else {
+				const queryError = callOutcome.result.asErr;
+				if (!queryError.isModule) {
+					// TODO: Cannot handle non module errors yet.
+					throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
+				}
+
+				// Get the explanation for the error
+				const moduleError = queryError.asModule;
+				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+
+				const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+				res.send(500, ret);
+				next();
+			}
 		} catch (err) {
 			console.error(err);
 			next(err);
@@ -53,6 +197,6 @@ export class QueryController implements IGroupableController {
 
 	prefix = '/contract/query';
 	endpoints = [
-		new Endpoint(HTTPMethod.GET, '/get', [this.handleGetGet]),
+		new Endpoint(HTTPMethod.GET, '', [this.handleGetQuery]),
 	];
 }

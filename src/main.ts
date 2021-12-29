@@ -36,7 +36,7 @@ import { TopLevelController as KeyringTopLevelController } from './controller/ke
 		.withController(new RPCController(api))
 		.withController(new TxController(api, keyring))
 		.withController(new InstantiationController(api, keyring))
-		.withController(new ContractQueryController(api, keyring))
+		.withController(new ContractQueryController(api))
 		.withController(new KeyringTopLevelController(api, keyring))
 		.getConfig();
 	const server = initServer(serverConfig);
