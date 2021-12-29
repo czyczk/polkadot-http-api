@@ -1,17 +1,13 @@
-import { ApiPromise, Keyring, SubmittableResult } from '@polkadot/api';
-import { ISubmittableResult } from '@polkadot/types/types';
-import { CodePromise, ContractPromise } from '@polkadot/api-contract';
-import { BlueprintSubmittableResult } from '@polkadot/api-contract/base/Blueprint';
-import { Hash } from '@polkadot/types/interfaces';
-import fs from 'fs';
+import { ApiPromise } from '@polkadot/api';
+import { ContractPromise } from '@polkadot/api-contract';
+import BN from 'bn.js';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import errs from 'restify-errors';
-import BN from 'bn.js';
 
-import { Endpoint, IGroupableController, TxExecutionResult } from '../model';
-import { loadExampleAbi } from './example-contract/util';
+import { Endpoint, IGroupableController } from '../model';
 import { DEFAULT_CONTRACT_QUERY_GAS_LIMIT, DEFAULT_CONTRACT_QUERY_VALUE } from './default-optional-params';
+import { loadExampleAbi } from './example-contract/util';
 import { ContractQueryErrorResult, ContractQuerySuccessResult, ExplainedDispatchError } from './model';
 
 export class QueryController implements IGroupableController {
