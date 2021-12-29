@@ -3,7 +3,6 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import { CodePromise } from '@polkadot/api-contract';
 import { BlueprintSubmittableResult } from '@polkadot/api-contract/base/Blueprint';
 import { Hash } from '@polkadot/types/interfaces';
-import { AccountId } from '@polkadot/types/interfaces/runtime/types';
 import fs from 'fs';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
@@ -25,8 +24,11 @@ export class QueryController implements IGroupableController {
 			let inBlockBlockHash: Hash;
 
 			const code = new CodePromise(this._api, this._abi, this._wasm);
-			const extrinsic = code.tx['default']({});
-			//const unsub = await extrinsic.signAndSend(signerAccount, (result: BlueprintSubmittableResult<'promise'>) => {
+			const extrinsic = code.tx['default']({
+				gasLimit: 200000000000,
+				salt: null,
+				value: 1000000000000000,
+			});
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: SubmittableResult) => {
 				if (result.status.isInBlock) {
 					inBlockBlockHash = result.status.asInBlock;
@@ -53,10 +55,4 @@ export class QueryController implements IGroupableController {
 	endpoints = [
 		new Endpoint(HTTPMethod.GET, '/get', [this.handleGetGet]),
 	];
-}
-
-export class ContractInitializationResult extends TxExecutionResult {
-	constructor(public address: AccountId, txHash: string, inBlockBlockHash: Hash, finalizedBlockHash?: Hash) {
-		super(txHash, inBlockBlockHash, finalizedBlockHash);
-	}
 }

@@ -1,4 +1,4 @@
-import { Hash } from '@polkadot/types/interfaces';
+import { DispatchInfo, Hash } from '@polkadot/types/interfaces';
 import HTTPMethod from 'http-method-enum';
 import restify from 'restify';
 
@@ -35,6 +35,11 @@ export class Endpoint {
 	}
 }
 
+// Contains all the info to be returned to the client about the result of the transaction execution. All info can be found from the `ISubmmittableResult` instance.
 export class TxExecutionResult {
-	constructor(public txHash: string, public inBlockBlockHash: Hash, public finalizedBlockHash?: Hash) { }
+	constructor(public readonly txHash: string, public readonly dispatchInfo: DispatchInfo, public readonly inBlockStatus: InBlockStatus) { }
+}
+
+export class InBlockStatus {
+	constructor(public readonly inBlock: Hash, public readonly finalized?: Hash) { }
 }

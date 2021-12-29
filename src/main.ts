@@ -7,10 +7,11 @@ import { ServerConfigBuilder } from './app-init/server-config-builder';
 import { ConstController } from './controller/api/const-controller';
 import { PingController } from './controller/api/ping-controller';
 import { QueryController as ApiQueryController } from './controller/api/query-controller';
+import { RegistryController } from './controller/api/registry-controller';
 import { RPCController } from './controller/api/rpc-controller';
 import { TopLevelController as ApiTopLevelController } from './controller/api/top-level-controller';
 import { TxController } from './controller/api/tx-controller';
-import { QueryController as ContractQueryController } from './controller/contract/QueryController';
+import { QueryController as ContractQueryController } from './controller/contract/query-controller';
 import { TopLevelController as KeyringTopLevelController } from './controller/keyring/top-level-controller';
 
 // Init API
@@ -30,6 +31,7 @@ import { TopLevelController as KeyringTopLevelController } from './controller/ke
 		.withController(new ApiTopLevelController(api))
 		.withController(new ConstController(api))
 		.withController(new ApiQueryController(api))
+		.withController(new RegistryController(api))
 		.withController(new RPCController(api))
 		.withController(new TxController(api, keyring))
 		.withController(new ContractQueryController(api, keyring))

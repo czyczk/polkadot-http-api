@@ -5,7 +5,7 @@ import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import errs, { InternalError } from 'restify-errors';
 
-import { Endpoint, IGroupableController, TxExecutionResult } from '../model';
+import { Endpoint, IGroupableController, InBlockStatus, TxExecutionResult } from '../model';
 
 export class TxController implements IGroupableController {
 	constructor(private readonly _api: ApiPromise, private readonly _keyring: Keyring) { }
@@ -43,23 +43,31 @@ export class TxController implements IGroupableController {
 			const extrinsicHash = extrinsic.hash.toHex();
 
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
-				if (result.status.isInBlock) {
-					inBlockBlockHash = result.status.asInBlock;
-
-					if (unsubIfInBlock) {
+				if (result.status.isInBlock || result.status.isFinalized) {
+					if (!result.dispatchInfo) {
 						unsub();
-						const ret = new TxExecutionResult(extrinsicHash, inBlockBlockHash);
+						next(new InternalError('Cannot get `dispatchInfo` from the result.'));
+						return;
+					}
+
+					if (result.status.isInBlock) {
+						inBlockBlockHash = result.status.asInBlock;
+
+						if (unsubIfInBlock) {
+							unsub();
+							const ret = new TxExecutionResult(extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
+							res.send(200, ret);
+							next();
+							return;
+						}
+					} else {
+						finalizedBlockHash = result.status.asFinalized;
+						unsub();
+						const ret = new TxExecutionResult(extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash, finalizedBlockHash));
 						res.send(200, ret);
 						next();
 						return;
 					}
-				} else if (result.status.isFinalized) {
-					finalizedBlockHash = result.status.asFinalized;
-					unsub();
-					const ret = new TxExecutionResult(extrinsicHash, inBlockBlockHash, finalizedBlockHash);
-					res.send(200, ret);
-					next();
-					return;
 				} else if (result.status.isDropped) {
 					unsub();
 					next(new InternalError('Transaction dropped.'));

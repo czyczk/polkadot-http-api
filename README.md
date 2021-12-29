@@ -1,7 +1,8 @@
 # Polkadot HTTP API
 
 ## Description
-An HTTP wrapper for Polkadot JS API. Useful for languages that cannot easily call Javascript functions. APIs are arranged in a similar way as the original Polkladot JS APIs.
+An HTTP wrapper for Polkadot JS API. Useful for languages that cannot easily call Javascript functions. APIs are arranged in a similar way as the original Polkladot JS APIs.  
+It covers a lot of useful APIs from not only `@polkadot/api` but also `@polkadot/keyring` and `@polkadot/api-contract`.
 
 ## Instructions
 
@@ -34,6 +35,7 @@ The column of Polkadot JS API is sorted in alphabetical order (except the ping A
 |`api.query.staking.validators.keys`|GET|`/api/query/staking/validators/keys`|||
 |`api.query.system.account`|GET|`/api/query/system/account/:addr`|||
 |`api.query.timestamp.now`|GET|`/api/query/timestamp/now`|||
+|`api.registry.findMetaError`|GET|`/api/registry/meta-error`|`index`, `error`||
 |`api.rpc.chain.getBlockHash`|GET|`/api/rpc/chain/block-hash/:blockNumber`|||
 |`api.rpc.chain.getHeader`|GET|`/api/rpc/chain/header`|||
 |`api.rpc.system.chain`|GET|`/api/rpc/system/chain`|||
