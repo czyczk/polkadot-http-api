@@ -78,7 +78,7 @@ Required parameters:
 - `wasm: file`: The WASM binary of the contract. Should be provided through a POST form multipart file.
 - `signerAddress: string`: The address of the transfer source, who also acts as the transaction signer. Can be in the form of any address type supported by Polkadot JS API. The signer must have been added to the API beforehand. If not, call `keyring.addFromUri` first.
 - `ctorFuncName: string`: The function name of the constructor you want to call to instantiate the contract. Refer to the ABI for it. It's usually `default` or `new`.
-- `ctorArgs: string | JSON`: The arguments for the constructor.
+- `ctorArgs: string | Array`: The arguments for the constructor. Should be an array in JSON form. If no arguments should be provided, leave it as `[]`.
 
 Optional parameters:  
 - `gasLimit: number`: Default to `200_000_000_000` (200,000 million).

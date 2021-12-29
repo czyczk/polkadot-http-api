@@ -5,7 +5,8 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import BN from 'bn.js';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
-import errs, { InternalError, NotImplementedError } from 'restify-errors';
+import errs from 'restify-errors';
+import fs from 'fs';
 
 import { Endpoint, IGroupableController, InBlockStatus } from '../model';
 import {
@@ -45,7 +46,7 @@ export class InstantiationController implements IGroupableController {
 				if (result.status.isInBlock || result.status.isFinalized) {
 					if (!result.dispatchInfo) {
 						unsub();
-						next(new InternalError('Cannot get `dispatchInfo` from the result.'));
+						next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
 						return;
 					}
 
@@ -57,8 +58,7 @@ export class InstantiationController implements IGroupableController {
 
 						if (!result.dispatchError.isModule) {
 							// TODO: Cannot handle non module errors yet.
-							next(new NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.'));
-							return;
+							throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
 						}
 
 						// Get the explanation for the error
@@ -81,7 +81,7 @@ export class InstantiationController implements IGroupableController {
 						if (!instantiatedRecords.length) {
 							// No "Instantiated" events found, hence an error
 							unsub();
-							next(new InternalError('Cannot get any "Instantiated" event.'));
+							next(new errs.InternalError('Cannot get any "Instantiated" event.'));
 							return;
 						}
 
@@ -105,11 +105,11 @@ export class InstantiationController implements IGroupableController {
 					}
 				} else if (result.status.isDropped) {
 					unsub();
-					next(new InternalError('Transaction dropped.'));
+					next(new errs.InternalError('Transaction dropped.'));
 					return;
 				} else if (result.status.isFinalityTimeout) {
 					unsub();
-					next(new InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
+					next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
 					return;
 				}
 			});
@@ -140,7 +140,7 @@ export class InstantiationController implements IGroupableController {
 				if (result.status.isInBlock || result.status.isFinalized) {
 					if (!result.dispatchInfo) {
 						unsub();
-						next(new InternalError('Cannot get `dispatchInfo` from the result.'));
+						next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
 						return;
 					}
 
@@ -152,8 +152,7 @@ export class InstantiationController implements IGroupableController {
 
 						if (!result.dispatchError.isModule) {
 							// TODO: Cannot handle non module errors yet.
-							next(new NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.'));
-							return;
+							throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
 						}
 
 						// Get the explanation for the error
@@ -176,7 +175,7 @@ export class InstantiationController implements IGroupableController {
 						if (!instantiatedRecords.length) {
 							// No "Instantiated" events found, hence an error
 							unsub();
-							next(new InternalError('Cannot get any "Instantiated" event.'));
+							next(new errs.InternalError('Cannot get any "Instantiated" event.'));
 							return;
 						}
 
@@ -200,11 +199,11 @@ export class InstantiationController implements IGroupableController {
 					}
 				} else if (result.status.isDropped) {
 					unsub();
-					next(new InternalError('Transaction dropped.'));
+					next(new errs.InternalError('Transaction dropped.'));
 					return;
 				} else if (result.status.isFinalityTimeout) {
 					unsub();
-					next(new InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
+					next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
 					return;
 				}
 			});
@@ -259,6 +258,11 @@ export class InstantiationController implements IGroupableController {
 				salt = req.body.salt;
 			}
 
+			let value = DEFAULT_CONTRACT_INSTANTIATION_VALUE;
+			if (req.body.value) {
+				value = req.body.value;
+			}
+
 			let unsubIfInBlock = DEFAULT_UNSUB_IF_IN_BLOCK;
 			if (req.body.unsubIfInBlock === false) {
 				unsubIfInBlock = false;
@@ -266,11 +270,15 @@ export class InstantiationController implements IGroupableController {
 
 			// Process the params
 			const signerAccount = this._keyring.getPair(signerAddress);
-			// TODO: wasm to Buffer
+			const wasmBuffer = fs.readFileSync(wasm.path);
 
-			// `ctorArgs` should be a JSON object. If it's from a POST form, it'll appear as a string, parse it to a JSON object.
-			if (ctorArgs && typeof (ctorArgs) === 'string') {
+			// `ctorArgs` should be a JSON array. If it's from a POST form, it'll appear as a string, parse it to a JSON array.
+			if (typeof (ctorArgs) === 'string') {
 				ctorArgs = JSON.parse(ctorArgs);
+			}
+			if (!Array.isArray(ctorArgs)) {
+				next(new errs.BadRequestError('`ctorArgs` should be an array.'));
+				return;
 			}
 
 			// Mess with the API calls
@@ -279,19 +287,24 @@ export class InstantiationController implements IGroupableController {
 			let finalizedBlockHash: Hash;
 			let address: AccountId;
 
-			const code = new CodePromise(this._api, abi, wasm);
-			const extrinsic = code.tx['default']({
-				gasLimit: DEFAULT_CONTRACT_INSTANTIATION_GAS_LIMIT,
-				salt: DEFAULT_CONTRACT_INSTANTIATION_SALT,
-				value: DEFAULT_CONTRACT_INSTANTIATION_VALUE,
-			});
+			const code = new CodePromise(this._api, abi, wasmBuffer);
+			// Make sure the constructor exists
+			if (!code.tx[ctorFuncName]) {
+				next(new errs.BadRequestError(`No constructor function named "${ctorFuncName}".`));
+				return;
+			}
+			const extrinsic = code.tx[ctorFuncName]({
+				gasLimit: gasLimit,
+				salt: salt,
+				value: value,
+			}, ...ctorArgs);
 			const extrinsicHash = extrinsic.hash.toHex();
 
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
 				if (result.status.isInBlock || result.status.isFinalized) {
 					if (!result.dispatchInfo) {
 						unsub();
-						next(new InternalError('Cannot get `dispatchInfo` from the result.'));
+						next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
 						return;
 					}
 
@@ -303,8 +316,7 @@ export class InstantiationController implements IGroupableController {
 
 						if (!result.dispatchError.isModule) {
 							// TODO: Cannot handle non module errors yet.
-							next(new NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.'));
-							return;
+							throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
 						}
 
 						// Get the explanation for the error
@@ -327,7 +339,7 @@ export class InstantiationController implements IGroupableController {
 						if (!instantiatedRecords.length) {
 							// No "Instantiated" events found, hence an error
 							unsub();
-							next(new InternalError('Cannot get any "Instantiated" event.'));
+							next(new errs.InternalError('Cannot get any "Instantiated" event.'));
 							return;
 						}
 
@@ -351,11 +363,11 @@ export class InstantiationController implements IGroupableController {
 					}
 				} else if (result.status.isDropped) {
 					unsub();
-					next(new InternalError('Transaction dropped.'));
+					next(new errs.InternalError('Transaction dropped.'));
 					return;
 				} else if (result.status.isFinalityTimeout) {
 					unsub();
-					next(new InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
+					next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
 					return;
 				}
 			});
@@ -365,12 +377,8 @@ export class InstantiationController implements IGroupableController {
 		}
 	};
 
-	// TODO
-	handlePostInstantiation = this.handleTestInstantiationShouldSucceed;
-
 	prefix = '/contract';
 	endpoints = [
-		// TODO
-		new Endpoint(HTTPMethod.POST, '/from-code', [this.handleTestInstantiationShouldSucceed]),
+		new Endpoint(HTTPMethod.POST, '/from-code', [this.handlePostFromCode]),
 	];
 }
