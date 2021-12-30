@@ -8,7 +8,7 @@ import errs from 'restify-errors';
 import { Endpoint, IGroupableController } from '../model';
 import { DEFAULT_CONTRACT_QUERY_GAS_LIMIT, DEFAULT_CONTRACT_QUERY_VALUE } from './default-optional-params';
 import { loadExampleAbi } from './example-contract/util';
-import { ContractQueryErrorResult, ContractQuerySuccessResult, ExplainedDispatchError } from './model';
+import { ContractQueryErrorResult, ContractQuerySuccessResult, ExplainedModuleError } from './model';
 
 export class QueryController implements IGroupableController {
 	constructor(private readonly _api: ApiPromise) { }
@@ -44,7 +44,7 @@ export class QueryController implements IGroupableController {
 				const moduleError = queryError.asModule;
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
-				const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
 				res.send(500, ret);
 				next();
@@ -86,7 +86,7 @@ export class QueryController implements IGroupableController {
 				const moduleError = queryError.asModule;
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
-				const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
 				res.send(500, ret);
 				next();
@@ -180,7 +180,7 @@ export class QueryController implements IGroupableController {
 				const moduleError = queryError.asModule;
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
-				const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
 				res.send(500, ret);
 				next();

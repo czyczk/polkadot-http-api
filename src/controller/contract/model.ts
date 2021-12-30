@@ -15,7 +15,7 @@ export class ContractInstantiationSuccessResult extends TxExecutionResult {
 
 // Contains all the info to be returned to the client about the result of a failed contract instantiation. All info can be found from the `ISubmmittableResult` instance.
 export class ContractInstantiationErrorResult extends TxExecutionResult {
-	constructor(txHash: string, public readonly explainedDispatchError: ExplainedDispatchError, dispatchInfo: DispatchInfo, inBlockStatus: InBlockStatus) {
+	constructor(txHash: string, public readonly explainedDispatchError: ExplainedModuleError, dispatchInfo: DispatchInfo, inBlockStatus: InBlockStatus) {
 		super(txHash, dispatchInfo, inBlockStatus);
 	}
 }
@@ -34,15 +34,15 @@ export class ContractQuerySuccessResult extends ContractQueryResultBase {
 
 // Contains all the info to be returned to the client about the result of a failed contract query.
 export class ContractQueryErrorResult extends ContractQueryResultBase {
-	constructor(public readonly explainedDispatchError: ExplainedDispatchError, gasConsumed: number) {
+	constructor(public readonly explainedModuleError: ExplainedModuleError, gasConsumed: number) {
 		super(gasConsumed);
 	}
 }
 
-export class ExplainedDispatchError {
+export class ExplainedModuleError {
 	constructor(public readonly index: u8, public readonly error: u8, public readonly type: string, public readonly details: string) { }
 
-	static fromRegistryError(index: u8, error: u8, registryError: RegistryError): ExplainedDispatchError {
+	static fromRegistryError(index: u8, error: u8, registryError: RegistryError): ExplainedModuleError {
 		const type = `${registryError.section}.${registryError.method}`;
 		const details = registryError.docs.join(' ');
 		return new this(index, error, type, details);

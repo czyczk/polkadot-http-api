@@ -16,7 +16,7 @@ import {
 	DEFAULT_UNSUB_IF_IN_BLOCK,
 } from './default-optional-params';
 import { loadExampleAbi, loadExampleWasm } from './example-contract/util';
-import { ContractInstantiationErrorResult, ContractInstantiationSuccessResult, ExplainedDispatchError } from './model';
+import { ContractInstantiationErrorResult, ContractInstantiationSuccessResult, ExplainedModuleError } from './model';
 
 export class InstantiationController implements IGroupableController {
 	constructor(private readonly _api: ApiPromise, private readonly _keyring: Keyring) { }
@@ -65,7 +65,7 @@ export class InstantiationController implements IGroupableController {
 						const moduleError = result.dispatchError.asModule;
 						const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
-						const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+						const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 						const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
 						res.send(500, ret);
 						return;
@@ -159,7 +159,7 @@ export class InstantiationController implements IGroupableController {
 						const moduleError = result.dispatchError.asModule;
 						const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
-						const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+						const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 						const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
 						res.send(500, ret);
 						return;
@@ -327,7 +327,7 @@ export class InstantiationController implements IGroupableController {
 						const moduleError = result.dispatchError.asModule;
 						const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
-						const explainedDispatchError = ExplainedDispatchError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+						const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 						const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
 						res.send(500, ret);
 						return;
