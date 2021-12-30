@@ -7,7 +7,7 @@ import errs from 'restify-errors';
 
 import { Endpoint, IGroupableController } from '../model';
 import { DEFAULT_CONTRACT_QUERY_GAS_LIMIT, DEFAULT_CONTRACT_QUERY_VALUE } from './default-optional-params';
-import { loadExampleAbi } from './example-contract/util';
+import { loadFlipperAbi } from './example-contracts/util';
 import { ContractQueryErrorResult, ContractQuerySuccessResult, ExplainedModuleError } from './model';
 
 export class QueryController implements IGroupableController {
@@ -15,7 +15,7 @@ export class QueryController implements IGroupableController {
 
 	private handleTestQueryGetShouldSucceed = async (req: Request, res: Response, next: Next) => {
 		try {
-			const abi = loadExampleAbi();
+			const abi = loadFlipperAbi();
 			const address = '5G4gQtoM8aihMBnt7DmJS7aQfh3NjC54NhXLRqKPdsKu8F2H';
 			const callerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 
@@ -57,7 +57,7 @@ export class QueryController implements IGroupableController {
 
 	private handleTestQueryGetShouldFail = async (req: Request, res: Response, next: Next) => {
 		try {
-			const abi = loadExampleAbi();
+			const abi = loadFlipperAbi();
 			const address = '5Cp5e1C38HtsBB4mnRFgidzxSJu3KZQLXjnrmwH4jLMEK8Lw'; // Non-existent contract address
 			const callerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 

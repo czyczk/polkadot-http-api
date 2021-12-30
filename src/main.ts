@@ -10,9 +10,10 @@ import { QueryController as ApiQueryController } from './controller/api/query-co
 import { RegistryController } from './controller/api/registry-controller';
 import { RPCController } from './controller/api/rpc-controller';
 import { TopLevelController as ApiTopLevelController } from './controller/api/top-level-controller';
-import { TxController } from './controller/api/tx-controller';
+import { TxController as ApiTxController } from './controller/api/tx-controller';
 import { InstantiationController } from './controller/contract/instantiation-controller';
 import { QueryController as ContractQueryController } from './controller/contract/query-controller';
+import { TxController as ContractTxController } from './controller/contract/tx-controller';
 import { TopLevelController as KeyringTopLevelController } from './controller/keyring/top-level-controller';
 
 // Init API
@@ -34,9 +35,10 @@ import { TopLevelController as KeyringTopLevelController } from './controller/ke
 		.withController(new ApiQueryController(api))
 		.withController(new RegistryController(api))
 		.withController(new RPCController(api))
-		.withController(new TxController(api, keyring))
+		.withController(new ApiTxController(api, keyring))
 		.withController(new InstantiationController(api, keyring))
 		.withController(new ContractQueryController(api))
+		.withController(new ContractTxController(api, keyring))
 		.withController(new KeyringTopLevelController(api, keyring))
 		.getConfig();
 	const server = initServer(serverConfig);

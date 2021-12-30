@@ -3,10 +3,10 @@ import { CodePromise } from '@polkadot/api-contract';
 import { AccountId, Hash } from '@polkadot/types/interfaces';
 import { ISubmittableResult } from '@polkadot/types/types';
 import BN from 'bn.js';
+import fs from 'fs';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import errs from 'restify-errors';
-import fs from 'fs';
 
 import { Endpoint, IGroupableController, InBlockStatus } from '../model';
 import {
@@ -15,7 +15,13 @@ import {
 	DEFAULT_CONTRACT_INSTANTIATION_VALUE,
 	DEFAULT_UNSUB_IF_IN_BLOCK,
 } from './default-optional-params';
-import { loadExampleAbi, loadExampleWasm } from './example-contract/util';
+import {
+	availableBuiltinContracts,
+	loadFlipperAbi,
+	loadFlipperWasm,
+	loadIncrementerAbi,
+	loadIncrementerWasm,
+} from './example-contracts/util';
 import { ContractInstantiationErrorResult, ContractInstantiationSuccessResult, ExplainedModuleError } from './model';
 
 export class InstantiationController implements IGroupableController {
@@ -23,6 +29,18 @@ export class InstantiationController implements IGroupableController {
 
 	private handleTestInstantiationShouldSucceed = async (req: Request, res: Response, next: Next) => {
 		try {
+			// Required params
+			const contractName: string = req.body.contractName;
+			if (!contractName) {
+				next(new errs.BadRequestError('Param `contractName` not specified.'));
+				return;
+			}
+			if (!availableBuiltinContracts.includes(contractName)) {
+				console.log(contractName);
+				next(new errs.BadRequestError('Param `contractName` should be one of the following: ' + availableBuiltinContracts));
+				return;
+			}
+
 			const signerAccount = this._keyring.getPair('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
 
 			await this._api.isReady;
@@ -31,8 +49,8 @@ export class InstantiationController implements IGroupableController {
 			let finalizedBlockHash: Hash;
 			let address: AccountId;
 
-			const abi = loadExampleAbi();
-			const wasm = loadExampleWasm();
+			const abi = contractName === 'flipper' ? loadFlipperAbi() : loadIncrementerAbi();
+			const wasm = contractName === 'flipper' ? loadIncrementerWasm() : loadIncrementerWasm();
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({
@@ -70,7 +88,6 @@ export class InstantiationController implements IGroupableController {
 						res.send(500, ret);
 						return;
 					}
-
 
 					// If `result.dispatchError` is not available, the instantiation succeeded.
 					// The contract instance "address" can be found from the last "Instantiated" event. The API hasn't provided an easy way to access it yet!!!
@@ -129,8 +146,8 @@ export class InstantiationController implements IGroupableController {
 			let finalizedBlockHash: Hash;
 			let address: AccountId;
 
-			const abi = loadExampleAbi();
-			const wasm = loadExampleWasm();
+			const abi = loadFlipperAbi();
+			const wasm = loadFlipperWasm();
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({});
@@ -384,5 +401,6 @@ export class InstantiationController implements IGroupableController {
 	prefix = '/contract';
 	endpoints = [
 		new Endpoint(HTTPMethod.POST, '/from-code', [this.handlePostFromCode]),
+		new Endpoint(HTTPMethod.POST, '/test-from-code', [this.handleTestInstantiationShouldSucceed]),
 	];
 }
