@@ -181,7 +181,7 @@ It contains not only the info of a common transaction execution result (see [Com
     "inBlockStatus": {
         "inBlock": "0x110a3245a0aad9edb005baa8e1b72aa351bec6ae78671e162d04b4702a7ad506"
     },
-    "explainedDispatchError": {
+    "explainedModuleError": {
         "index": "0x08",
         "error": "0x04",
         "type": "contracts.NewContractNotFunded",
@@ -219,7 +219,7 @@ It contains the gas consumed and the error codes and descriptions. An example is
 ```
 {
     "gasConsumed": 0,
-    "explainedDispatchError": {
+    "explainedModuleError": {
         "index": "0x08",
         "error": "0x07",
         "type": "contracts.ContractNotFound",
