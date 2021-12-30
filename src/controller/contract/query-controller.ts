@@ -30,7 +30,9 @@ export class QueryController implements IGroupableController {
 			});
 
 			if (callOutcome.result.isOk) {
-				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+				// `output` should `.toJSON()`. Or a normal number, say 1 will be displayed as "0x01".
+				const output = callOutcome.output !== null ? callOutcome.output.toJSON() : null;
+				const ret = new ContractQuerySuccessResult(output, callOutcome.gasConsumed.toNumber());
 				res.send(200, ret);
 				next();
 			} else {
@@ -45,7 +47,7 @@ export class QueryController implements IGroupableController {
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
 				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.debugMessage.toString(), callOutcome.gasConsumed.toNumber());
 				res.send(500, ret);
 				next();
 			}
@@ -72,7 +74,9 @@ export class QueryController implements IGroupableController {
 			});
 
 			if (callOutcome.result.isOk) {
-				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+				// `output` should `.toJSON()`. Or a normal number, say 1 will be displayed as "0x01".
+				const output = callOutcome.output !== null ? callOutcome.output.toJSON() : null;
+				const ret = new ContractQuerySuccessResult(output, callOutcome.gasConsumed.toNumber());
 				res.send(200, ret);
 				next();
 			} else {
@@ -87,7 +91,7 @@ export class QueryController implements IGroupableController {
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
 				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.debugMessage.toString(), callOutcome.gasConsumed.toNumber());
 				res.send(500, ret);
 				next();
 			}
@@ -166,7 +170,9 @@ export class QueryController implements IGroupableController {
 			}, ...funcArgs);
 
 			if (callOutcome.result.isOk) {
-				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+				// `output` should `.toJSON()`. Or a normal number, say 1 will be displayed as "0x01".
+				const output = callOutcome.output !== null ? callOutcome.output.toJSON() : null;
+				const ret = new ContractQuerySuccessResult(output, callOutcome.gasConsumed.toNumber());
 				res.send(200, ret);
 				next();
 			} else {
@@ -181,7 +187,7 @@ export class QueryController implements IGroupableController {
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
 				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.debugMessage.toString(), callOutcome.gasConsumed.toNumber());
 				res.send(500, ret);
 				next();
 			}
