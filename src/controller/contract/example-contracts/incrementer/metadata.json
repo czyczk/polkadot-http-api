@@ -1,8 +1,8 @@
 {
   "source": {
-    "hash": "0x11d7805001c6329509be6e8068b25229a553cbda77fce4154e2217c6f55cc7e2",
+    "hash": "0x4bc7d615ae7c1dc7e42f2be4fd74858059b6a89f4f9e4b0abd336cfd4180890a",
     "language": "ink! 3.0.0-rc7",
-    "compiler": "rustc 1.59.0-nightly"
+    "compiler": "rustc 1.58.0-nightly"
   },
   "contract": {
     "name": "incrementer",
@@ -62,9 +62,9 @@
               "name": "current_value",
               "type": {
                 "displayName": [
-                  "i32"
+                  "Result"
                 ],
-                "type": 0
+                "type": 10
               }
             }
           ],
@@ -191,7 +191,12 @@
             "inc_and_emit_event_and_fail"
           ],
           "payable": false,
-          "returnType": null,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 10
+          },
           "selector": "0xed831bc1"
         },
         {
@@ -602,6 +607,56 @@
           "path": [
             "Option"
           ]
+        }
+      },
+      {
+        "id": 10,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 0
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 11
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 0
+            },
+            {
+              "name": "E",
+              "type": 11
+            }
+          ],
+          "path": [
+            "Result"
+          ]
+        }
+      },
+      {
+        "id": 11,
+        "type": {
+          "def": {
+            "primitive": "str"
+          }
         }
       }
     ]

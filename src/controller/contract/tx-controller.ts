@@ -18,7 +18,7 @@ export class TxController implements IGroupableController {
 	private handleTestTxShouldSucceed = async (req: Request, res: Response, next: Next) => {
 		try {
 			const abi = loadIncrementerAbi();
-			const address = '5DCwR1c86ZaHQJv7bVE5gyVCV2iwL8qJnGcKjEJUvBsiUzTb';
+			const address = '5CVxfpAARVp1XEv9EvcyQkA6BgumMAVTe1uusQbo5mTx14GE';
 			const signerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 			const signerAccount = this._keyring.getPair(signerAddress);
 
@@ -33,7 +33,8 @@ export class TxController implements IGroupableController {
 			let finalizedBlockHash: Hash;
 			let parsedContractEvents: Record<string, unknown>[] | null = null;
 
-			const extrinsic = contract.tx['incAndEmitEventAndFail']({
+			//const extrinsic = contract.tx['incAndEmitEventAndFail']({
+			const extrinsic = contract.tx['incAndReturnValue']({
 				gasLimit: gasLimit,
 				value: value,
 			}, 1);

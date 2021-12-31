@@ -214,7 +214,7 @@ It contains the gas consumed and the output from the called contract function. A
 
 If a contract query is successful, the return value is of type `ContractQueryErrorResult`.
 
-It contains the gas consumed and the error codes and descriptions. An example is as below:
+It contains the gas consumed and the error codes and descriptions. Besides, there may be a debug message if there is one. An example is as below:
 
 ```
 {

@@ -137,7 +137,7 @@ export class QueryController implements IGroupableController {
 
 	private readonly _queryResultHelperFunc = async (callOutcome: ContractCallOutcome, res: Response, next: Next) => {
 		if (callOutcome.result.isOk) {
-			const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+			const ret = new ContractQuerySuccessResult(callOutcome.output?.toJSON(), callOutcome.gasConsumed.toNumber());
 			res.send(200, ret);
 			next();
 		} else {
@@ -152,7 +152,7 @@ export class QueryController implements IGroupableController {
 			const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
 
 			const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-			const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+			const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.debugMessage.toString(), callOutcome.gasConsumed.toNumber());
 			res.send(500, ret);
 			next();
 		}

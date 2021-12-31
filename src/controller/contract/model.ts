@@ -1,7 +1,7 @@
 import { DispatchInfo } from '@polkadot/types/interfaces';
 import { AccountId } from '@polkadot/types/interfaces/runtime/types';
 import { u8 } from '@polkadot/types/primitive/U8';
-import { Codec, RegistryError } from '@polkadot/types/types';
+import { AnyJson, RegistryError } from '@polkadot/types/types';
 
 import { InBlockStatus, TxExecutionResult } from '../model';
 
@@ -27,14 +27,14 @@ class ContractQueryResultBase {
 
 // Contains all the info to be returned to the client about the result of a successful contract query.
 export class ContractQuerySuccessResult extends ContractQueryResultBase {
-	constructor(public readonly output: Codec | null, gasConsumed: number) {
+	constructor(public readonly output: AnyJson | null, gasConsumed: number) {
 		super(gasConsumed);
 	}
 }
 
 // Contains all the info to be returned to the client about the result of a failed contract query.
 export class ContractQueryErrorResult extends ContractQueryResultBase {
-	constructor(public readonly explainedModuleError: ExplainedModuleError, gasConsumed: number) {
+	constructor(public readonly explainedModuleError: ExplainedModuleError, public readonly debugMessage: string, gasConsumed: number) {
 		super(gasConsumed);
 	}
 }
