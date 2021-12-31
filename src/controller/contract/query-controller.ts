@@ -137,6 +137,7 @@ export class QueryController implements IGroupableController {
 
 	private readonly _queryResultHelperFunc = async (callOutcome: ContractCallOutcome, res: Response, next: Next) => {
 		if (callOutcome.result.isOk) {
+			// `output` should `.toJSON()`. Or a normal number, say 1 will be displayed as "0x01".
 			const ret = new ContractQuerySuccessResult(callOutcome.output?.toJSON(), callOutcome.gasConsumed.toNumber());
 			res.send(200, ret);
 			next();
