@@ -1,5 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { ContractPromise } from '@polkadot/api-contract';
+import { ContractCallOutcome } from '@polkadot/api-contract/types';
 import BN from 'bn.js';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
@@ -29,26 +30,7 @@ export class QueryController implements IGroupableController {
 				value: value,
 			});
 
-			if (callOutcome.result.isOk) {
-				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
-				res.send(200, ret);
-				next();
-			} else {
-				const queryError = callOutcome.result.asErr;
-				if (!queryError.isModule) {
-					// TODO: Cannot handle non module errors yet.
-					throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
-				}
-
-				// Get the explanation for the error
-				const moduleError = queryError.asModule;
-				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
-
-				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
-				res.send(500, ret);
-				next();
-			}
+			await this._queryResultHelperFunc(callOutcome, res, next);
 		} catch (err) {
 			console.error(err);
 			next(err);
@@ -71,26 +53,7 @@ export class QueryController implements IGroupableController {
 				value: value,
 			});
 
-			if (callOutcome.result.isOk) {
-				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
-				res.send(200, ret);
-				next();
-			} else {
-				const queryError = callOutcome.result.asErr;
-				if (!queryError.isModule) {
-					// TODO: Cannot handle non module errors yet.
-					throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
-				}
-
-				// Get the explanation for the error
-				const moduleError = queryError.asModule;
-				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
-
-				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
-				res.send(500, ret);
-				next();
-			}
+			await this._queryResultHelperFunc(callOutcome, res, next);
 		} catch (err) {
 			console.error(err);
 			next(err);
@@ -165,29 +128,33 @@ export class QueryController implements IGroupableController {
 				value: value,
 			}, ...funcArgs);
 
-			if (callOutcome.result.isOk) {
-				const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
-				res.send(200, ret);
-				next();
-			} else {
-				const queryError = callOutcome.result.asErr;
-				if (!queryError.isModule) {
-					// TODO: Cannot handle non module errors yet.
-					throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
-				}
-
-				// Get the explanation for the error
-				const moduleError = queryError.asModule;
-				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
-
-				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
-				res.send(500, ret);
-				next();
-			}
+			await this._queryResultHelperFunc(callOutcome, res, next);
 		} catch (err) {
 			console.error(err);
 			next(err);
+		}
+	};
+
+	private readonly _queryResultHelperFunc = async (callOutcome: ContractCallOutcome, res: Response, next: Next) => {
+		if (callOutcome.result.isOk) {
+			const ret = new ContractQuerySuccessResult(callOutcome.output, callOutcome.gasConsumed.toNumber());
+			res.send(200, ret);
+			next();
+		} else {
+			const queryError = callOutcome.result.asErr;
+			if (!queryError.isModule) {
+				// TODO: Cannot handle non module errors yet.
+				throw new errs.NotImplementedError('`result.asErr` is not a module error. We don\'t know how to handle it yet.');
+			}
+
+			// Get the explanation for the error
+			const moduleError = queryError.asModule;
+			const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+
+			const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+			const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.gasConsumed.toNumber());
+			res.send(500, ret);
+			next();
 		}
 	};
 

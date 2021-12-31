@@ -45,9 +45,6 @@ export class InstantiationController implements IGroupableController {
 
 			await this._api.isReady;
 			const unsubIfInBlock = false;
-			let inBlockBlockHash: Hash;
-			let finalizedBlockHash: Hash;
-			let address: AccountId;
 
 			const abi = contractName === 'flipper' ? loadFlipperAbi() : loadIncrementerAbi();
 			const wasm = contractName === 'flipper' ? loadIncrementerWasm() : loadIncrementerWasm();
@@ -60,75 +57,10 @@ export class InstantiationController implements IGroupableController {
 			});
 			const extrinsicHash = extrinsic.hash.toHex();
 
+			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
-				if (result.status.isInBlock || result.status.isFinalized) {
-					if (!result.dispatchInfo) {
-						unsub();
-						next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
-						return;
-					}
-
-					// If `result.dispatchError` is available, the instantiation failed.
-					// Use the `index` and `error` fields to get an explained error and send the collected info to the client.
-					if (result.dispatchError) {
-						inBlockBlockHash = result.status.asInBlock;
-						unsub();
-
-						if (!result.dispatchError.isModule) {
-							// TODO: Cannot handle non module errors yet.
-							throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
-						}
-
-						// Get the explanation for the error
-						const moduleError = result.dispatchError.asModule;
-						const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
-
-						const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-						const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
-						res.send(500, ret);
-						return;
-					}
-
-					// If `result.dispatchError` is not available, the instantiation succeeded.
-					// The contract instance "address" can be found from the last "Instantiated" event. The API hasn't provided an easy way to access it yet!!!
-					// This workaround is from Canvas UI.
-					// So dear API authors, tell us about your plan if you're reading this :)
-					if (result.status.isInBlock) {
-						const instantiatedRecords = result.filterRecords('contracts', 'Instantiated');
-						if (!instantiatedRecords.length) {
-							// No "Instantiated" events found, hence an error
-							unsub();
-							next(new errs.InternalError('Cannot get any "Instantiated" event.'));
-							return;
-						}
-
-						address = instantiatedRecords[instantiatedRecords.length - 1].event.data[1] as AccountId;
-						inBlockBlockHash = result.status.asInBlock;
-
-						if (unsubIfInBlock) {
-							unsub();
-							const ret = new ContractInstantiationSuccessResult(address, extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
-							res.send(200, ret);
-							next();
-							return;
-						}
-					} else {
-						finalizedBlockHash = result.status.asFinalized;
-						unsub();
-						const ret = new ContractInstantiationSuccessResult(address, extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash, finalizedBlockHash));
-						res.send(200, ret);
-						next();
-						return;
-					}
-				} else if (result.status.isDropped) {
-					unsub();
-					next(new errs.InternalError('Transaction dropped.'));
-					return;
-				} else if (result.status.isFinalityTimeout) {
-					unsub();
-					next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
-					return;
-				}
+				this._instantiationResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
 			console.error(err);
@@ -142,9 +74,6 @@ export class InstantiationController implements IGroupableController {
 
 			await this._api.isReady;
 			const unsubIfInBlock = false;
-			let inBlockBlockHash: Hash;
-			let finalizedBlockHash: Hash;
-			let address: AccountId;
 
 			const abi = loadFlipperAbi();
 			const wasm = loadFlipperWasm();
@@ -153,76 +82,10 @@ export class InstantiationController implements IGroupableController {
 			const extrinsic = code.tx['default']({});
 			const extrinsicHash = extrinsic.hash.toHex();
 
+			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
-				if (result.status.isInBlock || result.status.isFinalized) {
-					if (!result.dispatchInfo) {
-						unsub();
-						next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
-						return;
-					}
-
-					// If `result.dispatchError` is available, the instantiation failed.
-					// Use the `index` and `error` fields to get an explained error and send the collected info to the client.
-					if (result.dispatchError) {
-						inBlockBlockHash = result.status.asInBlock;
-						unsub();
-
-						if (!result.dispatchError.isModule) {
-							// TODO: Cannot handle non module errors yet.
-							throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
-						}
-
-						// Get the explanation for the error
-						const moduleError = result.dispatchError.asModule;
-						const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
-
-						const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-						const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
-						res.send(500, ret);
-						return;
-					}
-
-
-					// If `result.dispatchError` is not available, the instantiation succeeded.
-					// The contract instance "address" can be found from the last "Instantiated" event. The API hasn't provided an easy way to access it yet!!!
-					// This workaround is from Canvas UI.
-					// So dear API authors, tell us about your plan if you're reading this :)
-					if (result.status.isInBlock) {
-						const instantiatedRecords = result.filterRecords('contracts', 'Instantiated');
-						if (!instantiatedRecords.length) {
-							// No "Instantiated" events found, hence an error
-							unsub();
-							next(new errs.InternalError('Cannot get any "Instantiated" event.'));
-							return;
-						}
-
-						address = instantiatedRecords[instantiatedRecords.length - 1].event.data[1] as AccountId;
-						inBlockBlockHash = result.status.asInBlock;
-
-						if (unsubIfInBlock) {
-							unsub();
-							const ret = new ContractInstantiationSuccessResult(address, extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
-							res.send(200, ret);
-							next();
-							return;
-						}
-					} else {
-						finalizedBlockHash = result.status.asFinalized;
-						unsub();
-						const ret = new ContractInstantiationSuccessResult(address, extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash, finalizedBlockHash));
-						res.send(200, ret);
-						next();
-						return;
-					}
-				} else if (result.status.isDropped) {
-					unsub();
-					next(new errs.InternalError('Transaction dropped.'));
-					return;
-				} else if (result.status.isFinalityTimeout) {
-					unsub();
-					next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
-					return;
-				}
+				this._instantiationResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
 			console.error(err);
@@ -304,9 +167,6 @@ export class InstantiationController implements IGroupableController {
 
 			// Mess with the API calls
 			await this._api.isReady;
-			let inBlockBlockHash: Hash;
-			let finalizedBlockHash: Hash;
-			let address: AccountId;
 
 			const code = new CodePromise(this._api, abi, wasmBuffer);
 			// Make sure the constructor exists
@@ -321,76 +181,10 @@ export class InstantiationController implements IGroupableController {
 			}, ...ctorArgs);
 			const extrinsicHash = extrinsic.hash.toHex();
 
+			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
-				if (result.status.isInBlock || result.status.isFinalized) {
-					if (!result.dispatchInfo) {
-						unsub();
-						next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
-						return;
-					}
-
-					// If `result.dispatchError` is available, the instantiation failed.
-					// Use the `index` and `error` fields to get an explained error and send the collected info to the client.
-					if (result.dispatchError) {
-						inBlockBlockHash = result.status.asInBlock;
-						unsub();
-
-						if (!result.dispatchError.isModule) {
-							// TODO: Cannot handle non module errors yet.
-							throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
-						}
-
-						// Get the explanation for the error
-						const moduleError = result.dispatchError.asModule;
-						const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
-
-						const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-						const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
-						res.send(500, ret);
-						return;
-					}
-
-
-					// If `result.dispatchError` is not available, the instantiation succeeded.
-					// The contract instance "address" can be found from the last "Instantiated" event. The API hasn't provided an easy way to access it yet!!!
-					// This workaround is from Canvas UI.
-					// So dear API authors, tell us about your plan if you're reading this :)
-					if (result.status.isInBlock) {
-						const instantiatedRecords = result.filterRecords('contracts', 'Instantiated');
-						if (!instantiatedRecords.length) {
-							// No "Instantiated" events found, hence an error
-							unsub();
-							next(new errs.InternalError('Cannot get any "Instantiated" event.'));
-							return;
-						}
-
-						address = instantiatedRecords[instantiatedRecords.length - 1].event.data[1] as AccountId;
-						inBlockBlockHash = result.status.asInBlock;
-
-						if (unsubIfInBlock) {
-							unsub();
-							const ret = new ContractInstantiationSuccessResult(address, extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash));
-							res.send(200, ret);
-							next();
-							return;
-						}
-					} else {
-						finalizedBlockHash = result.status.asFinalized;
-						unsub();
-						const ret = new ContractInstantiationSuccessResult(address, extrinsicHash, result.dispatchInfo, new InBlockStatus(inBlockBlockHash, finalizedBlockHash));
-						res.send(200, ret);
-						next();
-						return;
-					}
-				} else if (result.status.isDropped) {
-					unsub();
-					next(new errs.InternalError('Transaction dropped.'));
-					return;
-				} else if (result.status.isFinalityTimeout) {
-					unsub();
-					next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
-					return;
-				}
+				this._instantiationResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
 			console.error(err);
@@ -398,9 +192,95 @@ export class InstantiationController implements IGroupableController {
 		}
 	};
 
+	private readonly _instantiationResultCallbackFunc = (unsub: () => void, result: ISubmittableResult, readonlyPack: ReadonlyStatusPack, mutablePack: MutableStatusPack) => {
+		if (result.status.isInBlock || result.status.isFinalized) {
+			if (!result.dispatchInfo) {
+				unsub();
+				readonlyPack.next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
+				return;
+			}
+
+			// If `result.dispatchError` is available, the instantiation failed.
+			// Use the `index` and `error` fields to get an explained error and send the collected info to the client.
+			if (result.dispatchError) {
+				mutablePack.inBlockBlockHash = result.status.asInBlock;
+				unsub();
+
+				if (!result.dispatchError.isModule) {
+					// TODO: Cannot handle non module errors yet.
+					throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
+				}
+
+				// Get the explanation for the error
+				const moduleError = result.dispatchError.asModule;
+				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+
+				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
+				const ret = new ContractInstantiationErrorResult(readonlyPack.extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));
+				readonlyPack.res.send(500, ret);
+				return;
+			}
+
+			// If `result.dispatchError` is not available, the instantiation succeeded.
+			// The contract instance "address" can be found from the last "Instantiated" event. The API hasn't provided an easy way to access it yet!!!
+			// This workaround is from Canvas UI.
+			// So dear API authors, tell us about your plan if you're reading this :)
+			if (result.status.isInBlock) {
+				const instantiatedRecords = result.filterRecords('contracts', 'Instantiated');
+				if (!instantiatedRecords.length) {
+					// No "Instantiated" events found, hence an error
+					unsub();
+					readonlyPack.next(new errs.InternalError('Cannot get any "Instantiated" event.'));
+					return;
+				}
+
+				mutablePack.address = instantiatedRecords[instantiatedRecords.length - 1].event.data[1] as AccountId;
+				mutablePack.inBlockBlockHash = result.status.asInBlock;
+
+				if (readonlyPack.unsubIfInBlock) {
+					unsub();
+					const ret = new ContractInstantiationSuccessResult(mutablePack.address, readonlyPack.extrinsicHash, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));
+					readonlyPack.res.send(200, ret);
+					readonlyPack.next();
+					return;
+				}
+			} else {
+				mutablePack.finalizedBlockHash = result.status.asFinalized;
+				unsub();
+				if (!mutablePack.address || !mutablePack.inBlockBlockHash) {
+					// This should not happen.
+					throw new Error();
+				}
+				const ret = new ContractInstantiationSuccessResult(mutablePack.address, readonlyPack.extrinsicHash, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash, mutablePack.finalizedBlockHash));
+				readonlyPack.res.send(200, ret);
+				readonlyPack.next();
+				return;
+			}
+		} else if (result.status.isDropped) {
+			unsub();
+			readonlyPack.next(new errs.InternalError('Transaction dropped.'));
+			return;
+		} else if (result.status.isFinalityTimeout) {
+			unsub();
+			readonlyPack.next(new errs.InternalError(`Finality timeout at block hash '${result.status.asFinalityTimeout}'.`));
+			return;
+		}
+
+		// TODO: not covered result status
+		throw new errs.NotImplementedError(`We don't know how to handle result status of ${result.status} yet.`);
+	};
+
 	prefix = '/contract';
 	endpoints = [
 		new Endpoint(HTTPMethod.POST, '/from-code', [this.handlePostFromCode]),
 		new Endpoint(HTTPMethod.POST, '/test-from-code', [this.handleTestInstantiationShouldSucceed]),
 	];
+}
+
+class MutableStatusPack {
+	constructor(public inBlockBlockHash: Hash | null = null, public finalizedBlockHash: Hash | null = null, public address: AccountId | null = null) { }
+}
+
+class ReadonlyStatusPack {
+	constructor(public readonly res: Response, public readonly next: Next, public readonly extrinsicHash: string, public readonly unsubIfInBlock: boolean) { }
 }
