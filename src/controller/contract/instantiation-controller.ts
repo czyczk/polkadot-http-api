@@ -193,7 +193,11 @@ export class InstantiationController implements IGroupableController {
 	};
 
 	private readonly _instantiationResultCallbackFunc = (unsub: () => void, result: ISubmittableResult, readonlyPack: ReadonlyStatusPack, mutablePack: MutableStatusPack) => {
-		if (result.status.isInBlock || result.status.isFinalized) {
+		if (result.status.isReady) {
+			// Nothing to do if it's ready.
+			// Status identified here so that it's not an unknown status.
+			return;
+		} else if (result.status.isInBlock || result.status.isFinalized) {
 			if (!result.dispatchInfo) {
 				unsub();
 				readonlyPack.next(new errs.InternalError('Cannot get `dispatchInfo` from the result.'));
@@ -244,6 +248,8 @@ export class InstantiationController implements IGroupableController {
 					readonlyPack.next();
 					return;
 				}
+
+				return;
 			} else {
 				mutablePack.finalizedBlockHash = result.status.asFinalized;
 				unsub();
