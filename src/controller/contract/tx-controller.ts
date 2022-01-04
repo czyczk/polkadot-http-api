@@ -8,7 +8,7 @@ import { Next, Request, Response } from 'restify';
 import errs from 'restify-errors';
 
 import { Endpoint, IGroupableController, InBlockStatus } from '../model';
-import { DEFAULT_CONTRACT_TX_GAS_LIMIT, DEFAULT_CONTRACT_TX_VALUE } from './default-optional-params';
+import { DEFAULT_CONTRACT_TX_GAS_LIMIT, DEFAULT_CONTRACT_TX_VALUE, DEFAULT_UNSUB_IF_IN_BLOCK } from './default-optional-params';
 import { loadIncrementerAbi } from './example-contracts/util';
 import { ContractTxErrorResult, ContractTxSuccessResult, ExplainedModuleError } from './model';
 
@@ -35,7 +35,10 @@ export class TxController implements IGroupableController {
 				value: value,
 			}, 1);
 			const extrinsicHash = extrinsic.hash.toHex();
+			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ContractSubmittableResult) => {
+				this._txResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
 			console.error(err);
@@ -43,7 +46,91 @@ export class TxController implements IGroupableController {
 		}
 	};
 
-	handlePostTx = this.handleTestTxShouldSucceed;
+	handlePostTx = async (req: Request, res: Response, next: Next) => {
+		try {
+			// Required params
+			const abi = req.body.abi;
+			if (!abi) {
+				next(new errs.BadRequestError('Param `abi` not specified.'));
+				return;
+			}
+
+			const contractAddress = req.body.contractAddress;
+			if (!contractAddress) {
+				next(new errs.BadRequestError('Param `contractAddress` not specified.'));
+				return;
+			}
+
+			const signerAddress = req.body.signerAddress;
+			if (!signerAddress) {
+				next(new errs.BadRequestError('Param `signerAddress` not specified.'));
+				return;
+			}
+
+			const funcName = req.body.funcName;
+			if (!funcName) {
+				next(new errs.BadRequestError('Param `funcName` not specified.'));
+				return;
+			}
+
+			let funcArgs = req.body.funcArgs;
+			if (!funcArgs) {
+				next(new errs.BadRequestError('Param `funcArgs` not specified.'));
+				return;
+			}
+
+			// Optional params
+			let gasLimit = DEFAULT_CONTRACT_TX_GAS_LIMIT;
+			if (req.body.gasLimit) {
+				gasLimit = req.body.gasLimit;
+			}
+
+			// Process the params
+			const signerAccount = this._keyring.getPair(signerAddress);
+			// `funcArgs` should be a JSON array. Since it's from the GET query, it'll appear as a string, parse it to a JSON array.
+			if (typeof (funcArgs) === 'string') {
+				try {
+					funcArgs = JSON.parse(funcArgs);
+				} catch (_) {
+					next(new errs.BadRequestError('`funcArgs` is not a valid JSON string.'));
+				}
+			}
+			if (!Array.isArray(funcArgs)) {
+				next(new errs.BadRequestError('`funcArgs` should be an array.'));
+				return;
+			}
+
+			let unsubIfInBlock = DEFAULT_UNSUB_IF_IN_BLOCK;
+			if (req.body.unsubIfInBlock === false) {
+				unsubIfInBlock = false;
+			}
+
+			// Do API calls
+			await this._api.isReady;
+			const contract = new ContractPromise(this._api, abi, contractAddress);
+			const value = DEFAULT_CONTRACT_TX_VALUE;
+
+			// Make sure the function exists
+			if (!contract.query[funcName]) {
+				next(new errs.BadRequestError(`No function named "${funcName}".`));
+				return;
+			}
+
+			const extrinsic = contract.tx[funcName]({
+				gasLimit: gasLimit,
+				value: value,
+			}, ...funcArgs);
+			const extrinsicHash = extrinsic.hash.toHex();
+			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const mutablePack = new MutableStatusPack();
+			const unsub = await extrinsic.signAndSend(signerAccount, (result: ContractSubmittableResult) => {
+				this._txResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
+			});
+		} catch (err) {
+			console.error(err);
+			next(err);
+		}
+	};
 
 	private readonly _txResultCallbackFunc = (unsub: () => void, result: ContractSubmittableResult, readonlyPack: ReadonlyStatusPack, mutablePack: MutableStatusPack) => {
 		if (result.status.isReady) {
@@ -135,7 +222,7 @@ export class TxController implements IGroupableController {
 
 		// TODO: not covered result status
 		throw new errs.NotImplementedError(`We don't know how to handle result status of ${result.status} yet.`);
-	}
+	};
 
 	prefix = '/contract/tx';
 	endpoints = [

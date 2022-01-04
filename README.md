@@ -49,6 +49,7 @@ The column of Polkadot JS API is sorted in alphabetical order (except the ping A
 |`api.tx.balances.transfer`|POST|`/api/tx/balances/transfer`|`transferDest: string`, `transferValue: number`, `signerAddress: string`|`unsubIfInBlock: boolean`|
 |`code.tx.<constructor>`|POST|`/contract/from-code`|`abi`, `wasm`, `signerAddress`, `ctorFuncName`, `ctorArgs`|`gasLimit`, `salt`, `value`, `unsubIfInBlock`|
 |`contract.query.<funcName>`|GET|`/contract/query`|`abi`, `contractAddress`, `callerAddress`, `funcName`, `funcArgs`|`gasLimit`|
+|`contract.tx.<funcName>`|POST|`/contract/tx`|`abi`, `contractAddress`, `signerAddress`, `funcName`, `funcArgs`|`gasLimit`, `unsubIfInBlock`|
 |`keyring.addFromUri`|POST|`/keyring/from-uri`|`phrase`|`meta`|
 |`keyring.getPair`|GET|`/keyring/pair/:address`|||
 
