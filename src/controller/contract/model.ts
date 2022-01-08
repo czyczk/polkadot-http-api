@@ -15,7 +15,7 @@ export class ContractInstantiationSuccessResult extends TxExecutionResult {
 
 // Contains all the info to be returned to the client about the result of a failed contract instantiation. All info can be found from the `ISubmmittableResult` instance.
 export class ContractInstantiationErrorResult extends TxExecutionResult {
-	constructor(txHash: string, public readonly explainedDispatchError: ExplainedModuleError, dispatchInfo: DispatchInfo, inBlockStatus: InBlockStatus) {
+	constructor(txHash: string, public readonly explainedModuleError: ExplainedModuleError, dispatchInfo: DispatchInfo, inBlockStatus: InBlockStatus) {
 		super(txHash, dispatchInfo, inBlockStatus);
 	}
 }
