@@ -231,7 +231,7 @@ export class TxController implements IGroupableController {
 }
 
 class MutableStatusPack {
-	constructor(public inBlockBlockHash: Hash | null = null, public finalizedBlockHash: Hash | null = null, public parsedContractEvents: Record<string, unknown>[] | null = null) { }
+	constructor(public inBlockBlockHash: Hash | null = null, public finalizedBlockHash: Hash | null = null, public parsedContractEvents: Record<string, unknown>[] | undefined = undefined) { }
 }
 
 class ReadonlyStatusPack {

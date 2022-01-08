@@ -228,3 +228,69 @@ It contains the gas consumed and the error codes and descriptions. Besides, ther
     }
 }
 ```
+
+### Contract Transaction Result
+
+This section describes the return value of a contract transaction.
+
+Model class: [`ContractTxSuccessResult`](./src/controller/contract/model.ts#43) and [`ContractTxErrorResult`](./src/controller/contract/model.ts#50).
+
+**A successful transaction:**
+
+If a contract transaction is successful, the return value is of type `ContractTxSuccessResult`.
+
+It contains not only the info of a common transaction execution result (see [Common Transaction Execution Result](#common-transaction-execution-result)), but also the contract events emitted during the execution reorganized in a JSON object.  
+It doesn't contain the return value from the contract function due to the implementation of ink! and Substrate.  
+If the contract returns an `Ok(_)`, usually the return value is included in the events if the transaction is successful.  
+If the contract returns an `Err(_)`, the execution appears to be successful, but changes are actually reverted and no error message can be forwarded due to the implementation, nor with events. As for now, the error message can only be obtained through an extra query to the contract function.  
+An example of a successful transaction with events is as below:
+
+```
+{
+    "txHash": "0x52f15d954fe0ad825d149e5773f7445aa74f4b9f6dd64c07bcce0628c4a46c69",
+    "dispatchInfo": {
+        "weight": 2113231165,
+        "class": "Normal",
+        "paysFee": "Yes"
+    },
+    "inBlockStatus": {
+        "inBlock": "0x5f0e55717a9913c2c6098ed2805564d8cefdad400ae1296d2ca94ed7a7b9bc14"
+    },
+    "parsedContractEvents": [
+        {
+            "caller": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "currentValue": {
+                "ok": 1
+            }
+        }
+    ]
+}
+```
+
+**A failed transaction:**
+
+If a contract transaction fails, the return value is of type `ContractTxErrorResult`.
+
+It contains not only the info of a common transaction execution result (see [Common Transaction Execution Result](#common-transaction-execution-result)), but also the error codes and descriptions.  
+It doesn't contain the detailed error message from the contract due to the implementation of ink! and Substrate (i.e. any error is replaced by a `ContractTrapped` error). As for now, the error message can only be obtained through an extra query to the contract function.  
+An example is as below:
+
+```
+{
+    "txHash": "0x1dd4b3604279808289a6a2621024dbb092a906890b359899f316c13c41988553",
+    "dispatchInfo": {
+        "weight": 1249691424,
+        "class": "Normal",
+        "paysFee": "Yes"
+    },
+    "inBlockStatus": {
+        "inBlock": "0xd0b628ce689c2bc4df79b175685d5cc0a0bf5b42f44e657739cb0fbb8270cd27"
+    },
+    "explainedModuleError": {
+        "index": "0x08",
+        "error": "0x0c",
+        "type": "contracts.ContractTrapped",
+        "details": "Contract trapped during execution."
+    }
+}
+```

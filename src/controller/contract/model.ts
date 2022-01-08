@@ -41,7 +41,7 @@ export class ContractQueryErrorResult extends ContractQueryResultBase {
 
 // Contains all the info to be returned to the client about the result of a successful contract transaction. All info can be found from the `ContractSubmittableResult` instance.
 export class ContractTxSuccessResult extends TxExecutionResult {
-	constructor(txHash: string, public readonly parsedContractEvents: Record<string, unknown>[] | null, dispatchInfo: DispatchInfo, inBlockStatus: InBlockStatus) {
+	constructor(txHash: string, public readonly parsedContractEvents: Record<string, unknown>[] | undefined, dispatchInfo: DispatchInfo, inBlockStatus: InBlockStatus) {
 		super(txHash, dispatchInfo, inBlockStatus);
 	}
 }
