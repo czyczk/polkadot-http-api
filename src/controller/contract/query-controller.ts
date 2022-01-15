@@ -60,34 +60,35 @@ export class QueryController implements IGroupableController {
 		}
 	};
 
+	// Actually mapped as a POST endpoint, because weird things happen if the GET query string is too long
 	handleGetQuery = async (req: Request, res: Response, next: Next) => {
 		try {
 			// Required params
-			const abi = req.query.abi;
+			const abi = req.body.abi;
 			if (!abi) {
 				next(new errs.BadRequestError('Param `abi` not specified.'));
 				return;
 			}
 
-			const contractAddress = req.query.contractAddress;
+			const contractAddress = req.body.contractAddress;
 			if (!contractAddress) {
 				next(new errs.BadRequestError('Param `contractAddress` not specified.'));
 				return;
 			}
 
-			const callerAddress = req.query.callerAddress;
+			const callerAddress = req.body.callerAddress;
 			if (!callerAddress) {
 				next(new errs.BadRequestError('Param `callerAddress` not specified.'));
 				return;
 			}
 
-			const funcName = req.query.funcName;
+			const funcName = req.body.funcName;
 			if (!funcName) {
 				next(new errs.BadRequestError('Param `funcName` not specified.'));
 				return;
 			}
 
-			let funcArgs = req.query.funcArgs;
+			let funcArgs = req.body.funcArgs;
 			if (!funcArgs) {
 				next(new errs.BadRequestError('Param `funcArgs` not specified.'));
 				return;
@@ -95,8 +96,8 @@ export class QueryController implements IGroupableController {
 
 			// Optional params
 			let gasLimit = DEFAULT_CONTRACT_QUERY_GAS_LIMIT;
-			if (req.query.gasLimit) {
-				gasLimit = req.query.gasLimit;
+			if (req.body.gasLimit) {
+				gasLimit = req.body.gasLimit;
 			}
 
 			// Process the params
@@ -161,6 +162,6 @@ export class QueryController implements IGroupableController {
 
 	prefix = '/contract/query';
 	endpoints = [
-		new Endpoint(HTTPMethod.GET, '', [this.handleGetQuery]),
+		new Endpoint(HTTPMethod.POST, '', [this.handleGetQuery]),
 	];
 }

@@ -48,7 +48,7 @@ The column of Polkadot JS API is sorted in alphabetical order (except the ping A
 |`api.runtimeVersion`|GET|`/api/runtime-version`|||
 |`api.tx.balances.transfer`|POST|`/api/tx/balances/transfer`|`transferDest: string`, `transferValue: number`, `signerAddress: string`|`unsubIfInBlock: boolean`|
 |`code.tx.<constructor>`|POST|`/contract/from-code`|`abi`, `wasm`, `signerAddress`, `ctorFuncName`, `ctorArgs`|`gasLimit`, `salt`, `value`, `unsubIfInBlock`|
-|`contract.query.<funcName>`|GET|`/contract/query`|`abi`, `contractAddress`, `callerAddress`, `funcName`, `funcArgs`|`gasLimit`|
+|`contract.query.<funcName>`|POST|`/contract/query`|`abi`, `contractAddress`, `callerAddress`, `funcName`, `funcArgs`|`gasLimit`|
 |`contract.tx.<funcName>`|POST|`/contract/tx`|`abi`, `contractAddress`, `signerAddress`, `funcName`, `funcArgs`|`gasLimit`, `unsubIfInBlock`|
 |`keyring.addFromUri`|POST|`/keyring/from-uri`|`phrase`|`meta`|
 |`keyring.getPair`|GET|`/keyring/pair/:address`|||
@@ -93,7 +93,7 @@ See "[Contract Instantiation Result](#contract-instantiation-result)" section.
 
 **`contract.query.<funcName>`**
 
-HTTP method: GET  
+HTTP method: POST (to prevent inappropriate behaviors when the GET query string is too long)  
 HTTP endpoint: `/contract/from-code`  
 Description: Query a contract through its function.  
 Required parameters:  
