@@ -158,10 +158,24 @@ export class InstantiationController implements IGroupableController {
 					ctorArgs = JSON.parse(ctorArgs);
 				} catch (_) {
 					next(new errs.BadRequestError('`ctorArgs` is not a valid JSON string.'));
+					return;
 				}
 			}
 			if (!Array.isArray(ctorArgs)) {
 				next(new errs.BadRequestError('`ctorArgs` should be an array.'));
+				return;
+			}
+			// Every element in `ctorArgs` should be a JSON object.
+			try {
+				ctorArgs = ctorArgs.map(it => {
+					if (typeof (it) !== 'string') {
+						throw new errs.BadRequestError('Passed in element in `ctorArgs` is not a string.');
+					}
+
+					return JSON.parse(it);
+				});
+			} catch (err) {
+				next(err);
 				return;
 			}
 
@@ -212,6 +226,7 @@ export class InstantiationController implements IGroupableController {
 
 				if (!result.dispatchError.isModule) {
 					// TODO: Cannot handle non module errors yet.
+					readonlyPack.res.send(500, result.dispatchError);
 					throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
 				}
 

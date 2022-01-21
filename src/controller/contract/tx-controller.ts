@@ -87,16 +87,39 @@ export class TxController implements IGroupableController {
 
 			// Process the params
 			const signerAccount = this._keyring.getPair(signerAddress);
-			// `funcArgs` should be a JSON array. Since it's from the GET query, it'll appear as a string, parse it to a JSON array.
+			// `funcArgs` should be a JSON array. If it's from a POST form, it'll appear as a string, parse it to a JSON array.
 			if (typeof (funcArgs) === 'string') {
 				try {
 					funcArgs = JSON.parse(funcArgs);
 				} catch (_) {
 					next(new errs.BadRequestError('`funcArgs` is not a valid JSON string.'));
+					return;
 				}
 			}
 			if (!Array.isArray(funcArgs)) {
 				next(new errs.BadRequestError('`funcArgs` should be an array.'));
+				return;
+			}
+			// Every element in `funcArgs` should be a JSON object.
+			try {
+				funcArgs = funcArgs.map(it => {
+					if (it === null) {
+						return it;
+					}
+
+					if (typeof (it) !== 'string') {
+						throw new errs.BadRequestError('Passed in element in `funcArgs` is not a string.');
+					}
+
+					it = JSON.parse(it);
+					if (typeof (it) === 'object') {
+						it = new Map(Object.entries(it));
+					}
+
+					return it;
+				});
+			} catch (err) {
+				next(err);
 				return;
 			}
 
