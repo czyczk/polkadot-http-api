@@ -1,5 +1,4 @@
 import { ApiPromise } from '@polkadot/api';
-import { u64 } from '@polkadot/types/primitive';
 import { Codec } from '@polkadot/types/types';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
@@ -82,7 +81,7 @@ export class QueryController implements IGroupableController {
 			const blockHash = req.query.at;
 
 			await this._api.isReady;
-			let now: u64;
+			let now: Codec;
 			if (!blockHash) {
 				now = await this._api.query.timestamp.now();
 			} else {

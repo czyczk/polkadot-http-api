@@ -20,4 +20,14 @@ export const loadIncrementerWasm = () => {
 	return wasm;
 };
 
-export const availableBuiltinContracts = ['flipper', 'incrementer'];
+export const loadStructAbi = () => {
+	const abi = fs.readFileSync('./src/controller/contract/example-contracts/struct/metadata.json').toString();
+	return abi;
+};
+
+export const loadStructWasm = () => {
+	const wasm = fs.readFileSync('./src/controller/contract/example-contracts/struct/blbc.wasm');
+	return wasm;
+};
+
+export const availableBuiltinContracts = ['flipper', 'incrementer', 'struct'];

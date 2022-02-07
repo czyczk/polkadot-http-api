@@ -9,7 +9,7 @@ import errs from 'restify-errors';
 
 import { Endpoint, IGroupableController, InBlockStatus } from '../model';
 import { DEFAULT_CONTRACT_TX_GAS_LIMIT, DEFAULT_CONTRACT_TX_VALUE, DEFAULT_UNSUB_IF_IN_BLOCK } from './default-optional-params';
-import { loadIncrementerAbi } from './example-contracts/util';
+import { loadIncrementerAbi, loadStructAbi } from './example-contracts/util';
 import { ContractTxErrorResult, ContractTxSuccessResult, ExplainedModuleError } from './model';
 
 export class TxController implements IGroupableController {
@@ -34,6 +34,54 @@ export class TxController implements IGroupableController {
 				gasLimit: gasLimit,
 				value: value,
 			}, 1);
+			const extrinsicHash = extrinsic.hash.toHex();
+			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const mutablePack = new MutableStatusPack();
+			const unsub = await extrinsic.signAndSend(signerAccount, (result: ContractSubmittableResult) => {
+				this._txResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
+			});
+		} catch (err) {
+			console.error(err);
+			next(err);
+		}
+	};
+
+	private handleTestCreatingStructShouldSucceed = async (req: Request, res: Response, next: Next) => {
+		try {
+			const abi = loadStructAbi();
+			const address = '5EUXgbdJeoR4yTYYYuTXW9ebH74hmzUawsrE1EDWw4YJH7e1';
+			const signerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+			const signerAccount = this._keyring.getPair(signerAddress);
+
+			await this._api.isReady;
+			const contract = new ContractPromise(this._api, abi, address);
+			const value = DEFAULT_CONTRACT_TX_VALUE;
+			//const gasLimit = 3_000_000_000;
+			const gasLimit = DEFAULT_CONTRACT_TX_GAS_LIMIT;
+			const unsubIfInBlock = true;
+
+			const innerObj = {
+				id: '1213',
+				inner: {
+					id: '1211',
+					value: 'A string for value',
+					myValue: 'A string for myValue',
+				},
+				myInner: {
+					id: '1212',
+					value: 'A string for value',
+					myValue: 'A string for myValue',
+				},
+				extensions: {
+					mapKey: 'mapValue'
+				},
+				resourceType: 'Offchain'
+			};
+
+			const extrinsic = contract.tx['createOuter']({
+				gasLimit: gasLimit,
+				value: value,
+			}, innerObj, null);
 			const extrinsicHash = extrinsic.hash.toHex();
 			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
 			const mutablePack = new MutableStatusPack();
@@ -249,6 +297,8 @@ export class TxController implements IGroupableController {
 
 	prefix = '/contract/tx';
 	endpoints = [
+		// TODO: remove it after testing
+		new Endpoint(HTTPMethod.POST, '/test-struct', [this.handleTestCreatingStructShouldSucceed]),
 		new Endpoint(HTTPMethod.POST, '', [this.handlePostTx]),
 	];
 }

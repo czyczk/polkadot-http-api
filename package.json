@@ -6,8 +6,8 @@
   "author": "Zenas Chen <czyczk@qq.com>",
   "license": "MIT",
   "dependencies": {
-    "@polkadot/api": "^6.12.1",
-    "@polkadot/api-contract": "^6.12.1",
+    "@polkadot/api": "^7.7.1",
+    "@polkadot/api-contract": "^7.7.1",
     "http-method-enum": "^1.0.0",
     "restify": "^8.6.0",
     "restify-errors": "^8.0.2"

@@ -1,6 +1,6 @@
 import { DispatchInfo } from '@polkadot/types/interfaces';
 import { AccountId } from '@polkadot/types/interfaces/runtime/types';
-import { u8 } from '@polkadot/types/primitive/U8';
+import { u8 } from '@polkadot/types-codec/primitive/U8';
 import { AnyJson, RegistryError } from '@polkadot/types/types';
 
 import { InBlockStatus, TxExecutionResult } from '../model';

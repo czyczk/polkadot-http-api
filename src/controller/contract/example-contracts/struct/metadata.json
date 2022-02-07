@@ -1,0 +1,844 @@
+{
+  "source": {
+    "hash": "0x01e38c265db9c6ab03d2216334513e5b20ac508c3790f31642ac3b31096b86a0",
+    "language": "ink! 3.0.0-rc8",
+    "compiler": "rustc 1.60.0-nightly"
+  },
+  "contract": {
+    "name": "blbc",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "V3": {
+    "spec": {
+      "constructors": [
+        {
+          "args": [],
+          "docs": [],
+          "label": "default",
+          "payable": false,
+          "selector": "0xed4b9d1b"
+        }
+      ],
+      "docs": [],
+      "events": [
+        {
+          "args": [
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "event_id",
+              "type": {
+                "displayName": [
+                  "String"
+                ],
+                "type": 3
+              }
+            },
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "struct_id",
+              "type": {
+                "displayName": [
+                  "String"
+                ],
+                "type": 3
+              }
+            }
+          ],
+          "docs": [],
+          "label": "StructCreated"
+        }
+      ],
+      "messages": [
+        {
+          "args": [
+            {
+              "label": "inner",
+              "type": {
+                "displayName": [
+                  "Inner"
+                ],
+                "type": 7
+              }
+            },
+            {
+              "label": "event_id",
+              "type": {
+                "displayName": [
+                  "Option"
+                ],
+                "type": 13
+              }
+            }
+          ],
+          "docs": [],
+          "label": "create_inner",
+          "mutates": true,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 14
+          },
+          "selector": "0xc5330adb"
+        },
+        {
+          "args": [
+            {
+              "label": "outer",
+              "type": {
+                "displayName": [
+                  "Outer"
+                ],
+                "type": 6
+              }
+            },
+            {
+              "label": "event_id",
+              "type": {
+                "displayName": [
+                  "Option"
+                ],
+                "type": 13
+              }
+            }
+          ],
+          "docs": [],
+          "label": "create_outer",
+          "mutates": true,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 14
+          },
+          "selector": "0xd5ca8614"
+        },
+        {
+          "args": [
+            {
+              "label": "struct_id",
+              "type": {
+                "displayName": [
+                  "String"
+                ],
+                "type": 3
+              }
+            }
+          ],
+          "docs": [],
+          "label": "get_inner",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 16
+          },
+          "selector": "0x11b81834"
+        },
+        {
+          "args": [
+            {
+              "label": "struct_id",
+              "type": {
+                "displayName": [
+                  "String"
+                ],
+                "type": 3
+              }
+            }
+          ],
+          "docs": [],
+          "label": "get_outer",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 17
+          },
+          "selector": "0x57c417ac"
+        }
+      ]
+    },
+    "storage": {
+      "struct": {
+        "fields": [
+          {
+            "layout": {
+              "struct": {
+                "fields": [
+                  {
+                    "layout": {
+                      "struct": {
+                        "fields": [
+                          {
+                            "layout": {
+                              "cell": {
+                                "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                                "ty": 0
+                              }
+                            },
+                            "name": "header"
+                          },
+                          {
+                            "layout": {
+                              "struct": {
+                                "fields": [
+                                  {
+                                    "layout": {
+                                      "cell": {
+                                        "key": "0x0100000000000000000000000000000000000000000000000000000000000000",
+                                        "ty": 1
+                                      }
+                                    },
+                                    "name": "len"
+                                  },
+                                  {
+                                    "layout": {
+                                      "array": {
+                                        "cellsPerElem": 1,
+                                        "layout": {
+                                          "cell": {
+                                            "key": "0x0100000001000000000000000000000000000000000000000000000000000000",
+                                            "ty": 2
+                                          }
+                                        },
+                                        "len": 4294967295,
+                                        "offset": "0x0200000000000000000000000000000000000000000000000000000000000000"
+                                      }
+                                    },
+                                    "name": "elems"
+                                  }
+                                ]
+                              }
+                            },
+                            "name": "entries"
+                          }
+                        ]
+                      }
+                    },
+                    "name": "keys"
+                  },
+                  {
+                    "layout": {
+                      "hash": {
+                        "layout": {
+                          "cell": {
+                            "key": "0x0200000001000000000000000000000000000000000000000000000000000000",
+                            "ty": 5
+                          }
+                        },
+                        "offset": "0x0100000001000000000000000000000000000000000000000000000000000000",
+                        "strategy": {
+                          "hasher": "Blake2x256",
+                          "postfix": "",
+                          "prefix": "0x696e6b20686173686d6170"
+                        }
+                      }
+                    },
+                    "name": "values"
+                  }
+                ]
+              }
+            },
+            "name": "res_outer_map"
+          },
+          {
+            "layout": {
+              "struct": {
+                "fields": [
+                  {
+                    "layout": {
+                      "struct": {
+                        "fields": [
+                          {
+                            "layout": {
+                              "cell": {
+                                "key": "0x0200000001000000000000000000000000000000000000000000000000000000",
+                                "ty": 0
+                              }
+                            },
+                            "name": "header"
+                          },
+                          {
+                            "layout": {
+                              "struct": {
+                                "fields": [
+                                  {
+                                    "layout": {
+                                      "cell": {
+                                        "key": "0x0300000001000000000000000000000000000000000000000000000000000000",
+                                        "ty": 1
+                                      }
+                                    },
+                                    "name": "len"
+                                  },
+                                  {
+                                    "layout": {
+                                      "array": {
+                                        "cellsPerElem": 1,
+                                        "layout": {
+                                          "cell": {
+                                            "key": "0x0300000002000000000000000000000000000000000000000000000000000000",
+                                            "ty": 2
+                                          }
+                                        },
+                                        "len": 4294967295,
+                                        "offset": "0x0400000001000000000000000000000000000000000000000000000000000000"
+                                      }
+                                    },
+                                    "name": "elems"
+                                  }
+                                ]
+                              }
+                            },
+                            "name": "entries"
+                          }
+                        ]
+                      }
+                    },
+                    "name": "keys"
+                  },
+                  {
+                    "layout": {
+                      "hash": {
+                        "layout": {
+                          "cell": {
+                            "key": "0x0400000002000000000000000000000000000000000000000000000000000000",
+                            "ty": 12
+                          }
+                        },
+                        "offset": "0x0300000002000000000000000000000000000000000000000000000000000000",
+                        "strategy": {
+                          "hasher": "Blake2x256",
+                          "postfix": "",
+                          "prefix": "0x696e6b20686173686d6170"
+                        }
+                      }
+                    },
+                    "name": "values"
+                  }
+                ]
+              }
+            },
+            "name": "res_inner_map"
+          }
+        ]
+      }
+    },
+    "types": [
+      {
+        "id": 0,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "last_vacant",
+                  "type": 1,
+                  "typeName": "Index"
+                },
+                {
+                  "name": "len",
+                  "type": 1,
+                  "typeName": "u32"
+                },
+                {
+                  "name": "len_entries",
+                  "type": 1,
+                  "typeName": "u32"
+                }
+              ]
+            }
+          },
+          "path": [
+            "ink_storage",
+            "collections",
+            "stash",
+            "Header"
+          ]
+        }
+      },
+      {
+        "id": 1,
+        "type": {
+          "def": {
+            "primitive": "u32"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 4,
+                      "typeName": "VacantEntry"
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Vacant"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 3,
+                      "typeName": "T"
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Occupied"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 3
+            }
+          ],
+          "path": [
+            "ink_storage",
+            "collections",
+            "stash",
+            "Entry"
+          ]
+        }
+      },
+      {
+        "id": 3,
+        "type": {
+          "def": {
+            "primitive": "str"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "next",
+                  "type": 1,
+                  "typeName": "Index"
+                },
+                {
+                  "name": "prev",
+                  "type": 1,
+                  "typeName": "Index"
+                }
+              ]
+            }
+          },
+          "path": [
+            "ink_storage",
+            "collections",
+            "stash",
+            "VacantEntry"
+          ]
+        }
+      },
+      {
+        "id": 5,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "value",
+                  "type": 6,
+                  "typeName": "V"
+                },
+                {
+                  "name": "key_index",
+                  "type": 1,
+                  "typeName": "KeyIndex"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "V",
+              "type": 6
+            }
+          ],
+          "path": [
+            "ink_storage",
+            "collections",
+            "hashmap",
+            "ValueEntry"
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": 3,
+                  "typeName": "String"
+                },
+                {
+                  "name": "inner",
+                  "type": 7,
+                  "typeName": "Inner"
+                },
+                {
+                  "name": "my_inner",
+                  "type": 7,
+                  "typeName": "Inner"
+                },
+                {
+                  "name": "extensions",
+                  "type": 8,
+                  "typeName": "BTreeMap<String, String>"
+                },
+                {
+                  "name": "resource_type",
+                  "type": 11,
+                  "typeName": "ResourceType"
+                }
+              ]
+            }
+          },
+          "path": [
+            "blbc",
+            "model",
+            "data",
+            "Outer"
+          ]
+        }
+      },
+      {
+        "id": 7,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": 3,
+                  "typeName": "String"
+                },
+                {
+                  "name": "value",
+                  "type": 3,
+                  "typeName": "String"
+                },
+                {
+                  "name": "my_value",
+                  "type": 3,
+                  "typeName": "String"
+                }
+              ]
+            }
+          },
+          "path": [
+            "blbc",
+            "model",
+            "data",
+            "Inner"
+          ]
+        }
+      },
+      {
+        "id": 8,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "type": 9
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "K",
+              "type": 3
+            },
+            {
+              "name": "V",
+              "type": 3
+            }
+          ],
+          "path": [
+            "BTreeMap"
+          ]
+        }
+      },
+      {
+        "id": 9,
+        "type": {
+          "def": {
+            "sequence": {
+              "type": 10
+            }
+          }
+        }
+      },
+      {
+        "id": 10,
+        "type": {
+          "def": {
+            "tuple": [
+              3,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "id": 11,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "Plain"
+                },
+                {
+                  "index": 1,
+                  "name": "Encrypted"
+                },
+                {
+                  "index": 2,
+                  "name": "Offchain"
+                }
+              ]
+            }
+          },
+          "path": [
+            "blbc",
+            "model",
+            "data",
+            "ResourceType"
+          ]
+        }
+      },
+      {
+        "id": 12,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "value",
+                  "type": 7,
+                  "typeName": "V"
+                },
+                {
+                  "name": "key_index",
+                  "type": 1,
+                  "typeName": "KeyIndex"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "V",
+              "type": 7
+            }
+          ],
+          "path": [
+            "ink_storage",
+            "collections",
+            "hashmap",
+            "ValueEntry"
+          ]
+        }
+      },
+      {
+        "id": 13,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "None"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 3
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Some"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 3
+            }
+          ],
+          "path": [
+            "Option"
+          ]
+        }
+      },
+      {
+        "id": 14,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 15
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 3
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 15
+            },
+            {
+              "name": "E",
+              "type": 3
+            }
+          ],
+          "path": [
+            "Result"
+          ]
+        }
+      },
+      {
+        "id": 15,
+        "type": {
+          "def": {
+            "tuple": []
+          }
+        }
+      },
+      {
+        "id": 16,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 7
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 3
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 7
+            },
+            {
+              "name": "E",
+              "type": 3
+            }
+          ],
+          "path": [
+            "Result"
+          ]
+        }
+      },
+      {
+        "id": 17,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 6
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 3
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 6
+            },
+            {
+              "name": "E",
+              "type": 3
+            }
+          ],
+          "path": [
+            "Result"
+          ]
+        }
+      }
+    ]
+  }
+}
