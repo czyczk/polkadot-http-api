@@ -148,28 +148,6 @@ export class TxController implements IGroupableController {
 				next(new errs.BadRequestError('`funcArgs` should be an array.'));
 				return;
 			}
-			// Every element in `funcArgs` should be a JSON object.
-			try {
-				funcArgs = funcArgs.map(it => {
-					if (it === null) {
-						return it;
-					}
-
-					if (typeof (it) !== 'string') {
-						throw new errs.BadRequestError('Passed in element in `funcArgs` is not a string.');
-					}
-
-					it = JSON.parse(it);
-					if (typeof (it) === 'object') {
-						it = new Map(Object.entries(it));
-					}
-
-					return it;
-				});
-			} catch (err) {
-				next(err);
-				return;
-			}
 
 			let unsubIfInBlock = DEFAULT_UNSUB_IF_IN_BLOCK;
 			if (req.body.unsubIfInBlock === false) {

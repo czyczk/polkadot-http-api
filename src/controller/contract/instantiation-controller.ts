@@ -230,6 +230,8 @@ export class InstantiationController implements IGroupableController {
 					throw new errs.NotImplementedError('`result.dispatchError` is not a module error. We don\'t know how to handle it yet.');
 				}
 
+				console.error(result.toHuman());
+
 				// Get the explanation for the error
 				const moduleError = result.dispatchError.asModule;
 				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
