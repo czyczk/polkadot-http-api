@@ -11,26 +11,29 @@ class EventManager {
 		return this.instance;
 	}
 
-	subscribeEvent(eventID:string) {
-		if (!this.eventInfo.has(eventID)) {
-			this.eventInfo.set(eventID, new Array<string>());
+	subscribeEvent(event:EventStruct) {
+		if (!this.eventInfo.has(event)) {
+			this.eventInfo.set(JSON.stringify(event), new Array<string>());
 		}
 	}
 
-	unsubscribeEvent(eventID:string) {
-		this.eventInfo.delete(eventID);
+	unsubscribeEvent(event:EventStruct) {
+		this.eventInfo.delete(JSON.stringify(event));
 	}
 
-	addEventInfo(eventID:string, eventInfo:string) {
-		if (this.eventInfo.has(eventID)) {
-			this.eventInfo.get(eventID).push(eventInfo);
+	addEventInfo(key:string, eventInfo:string) {
+		if (this.eventInfo.has(key)) {
+			this.eventInfo.get(key).push(eventInfo);
+			//console.log('yes', this.eventInfo);
 		}		
 	}
 
-	releaseEventInfo(eventID:string) {
-		if (this.eventInfo.has(eventID)) {
-			let info = this.eventInfo.get(eventID);
-			this.eventInfo.set(eventID, new Array<string>());
+	releaseEventInfo(event:EventStruct) {
+		console.log(this.eventInfo)
+		console.log(JSON.stringify(event))
+		if (this.eventInfo.has(JSON.stringify(event))) {
+			let info = this.eventInfo.get(JSON.stringify(event));
+			this.eventInfo.set(JSON.stringify(event), new Array<string>());
 			return info;
 		}
 		return new Array<String>();
@@ -39,4 +42,12 @@ class EventManager {
 		return this.eventInfo.keys();
 	}
 }
-export {EventManager};
+class EventStruct {
+	private contrastAddress:string;
+	private eventID:string;
+	constructor(contrastAddress:string, eventID:string){
+		this.contrastAddress=contrastAddress;
+		this.eventID = eventID;
+	}
+}
+export {EventManager, EventStruct};
