@@ -1,53 +1,92 @@
-class EventManager {
-	private static instance: EventManager;
-	private eventInfo;
-	private constructor() {
-		this.eventInfo = new Map();
+import { ApiPromise } from '@polkadot/api';
+import HTTPMethod from 'http-method-enum';
+import { Next, Request, Response } from 'restify';
+import {EventManager, EventStruct} from '../../event-manager/event-manager';
+import { Endpoint, IGroupableController } from '../model';
+
+export class EventController implements IGroupableController {
+	private eventManager:EventManager;
+	constructor(private readonly _api: ApiPromise) { 
+		this.eventManager = EventManager.getInstance();
+		this.handleGetSystemChainTest();
 	}
-	static getInstance() {
-		if (!this.instance) {
-			this.instance = new EventManager();
+	async handleGetSystemChainTest(){
+		try {
+			await this._api.isReady;
+			//const chain = await this._api.rpc.system.chain(); 
+			//const lastHeader = await this._api.rpc.chain.getHeader(); 
+			const chain = await this._api.rpc.system.chain(); 
+			this._api.rpc.beefy.subscribeJustifications
+			await this._api.rpc.chain.subscribeNewHeads((lastHeader) => { 
+				this._api.hasSubscriptions
+				console.log(`${chain}: last block #${lastHeader.number} has hash ${lastHeader.hash}`);
+				/**
+				 * managerEvent
+				 * headerhasp=>block
+				 * for event in Manger Event:
+				 *	manager.hashmap.get(event).append(extraction(event, block))
+				 * eventId
+				 * return hashmap.pull(hashmap.get(event))
+				 */
+				 for (let name of this.eventManager.getEventKeys()) {
+					 this.eventManager.addEventInfo(name, String(lastHeader.number));
+				 }
+			});
+		} catch (err) {
+			console.error(err);
 		}
-		return this.instance;
 	}
 
-	subscribeEvent(event:EventStruct) {
-		if (!this.eventInfo.has(event)) {
-			this.eventInfo.set(JSON.stringify(event), new Array<string>());
+	handleSubscriptEvent = (req:Request, res:Response, next:Next) => {
+		const eventID = req.body.eventID;
+		const contrastAddress = req.body.contrastAddress;
+		const event = new EventStruct(contrastAddress, eventID);
+		console.log('handleSubscriptEvent',eventID);
+		try {
+			this.eventManager.subscribeEvent(event);
+			res.send(200, "subscribe success");
+			return;
+		} catch (err) {
+			console.error(err);
+			next(err);
 		}
 	}
 
-	unsubscribeEvent(event:EventStruct) {
-		this.eventInfo.delete(JSON.stringify(event));
-	}
+	handleUnsubscriptEvent = (req:Request, res:Response, next:Next) => {
+		const eventID = req.body.eventID;
+		const contrastAddress = req.body.contrastAddress;
+		const event = new EventStruct(contrastAddress, eventID);
 
-	addEventInfo(key:string, eventInfo:string) {
-		if (this.eventInfo.has(key)) {
-			this.eventInfo.get(key).push(eventInfo);
-			//console.log('yes', this.eventInfo);
-		}		
-	}
-
-	releaseEventInfo(event:EventStruct) {
-		console.log(this.eventInfo)
-		console.log(JSON.stringify(event))
-		if (this.eventInfo.has(JSON.stringify(event))) {
-			let info = this.eventInfo.get(JSON.stringify(event));
-			this.eventInfo.set(JSON.stringify(event), new Array<string>());
-			return info;
+		try {
+			this.eventManager.unsubscribeEvent(event);
+			res.send(200, "unsubscribe success");
+			return;
+		} catch (err) {
+			console.error(err);
+			next(err);
 		}
-		return new Array<String>();
 	}
-	getEventKeys() {
-		return this.eventInfo.keys();
+
+	handleReleaseEvent = (req:Request, res:Response, next:Next) => {
+		const eventID = req.body.eventID;
+		const contrastAddress = req.body.contrastAddress;
+		const event = new EventStruct(contrastAddress, eventID);
+		console.log('handleUnsubscriptEvent',eventID);
+
+		try {
+			const result = this.eventManager.releaseEventInfo(event);
+			res.send(200, result);
+			return;
+		} catch (err) {
+			console.error(err);
+			next(err);
+		}
 	}
+
+	prefix = '/event';
+	endpoints = [
+		new Endpoint(HTTPMethod.POST, '/subscribe', [this.handleSubscriptEvent]),
+		new Endpoint(HTTPMethod.POST, '/unsubscript', [this.handleUnsubscriptEvent]),
+		new Endpoint(HTTPMethod.POST, '/releaseEvent', [this.handleReleaseEvent]),
+	];
 }
-class EventStruct {
-	private contrastAddress:string;
-	private eventID:string;
-	constructor(contrastAddress:string, eventID:string){
-		this.contrastAddress=contrastAddress;
-		this.eventID = eventID;
-	}
-}
-export {EventManager, EventStruct};
