@@ -15,16 +15,16 @@ class EventManager {
 	}
 	subscribeEvent(event:EventStruct) {
 		this.lock.readLock('read lock',(release) => {
-			console.log('subscribe read lock ');
+			//console.log('subscribe read lock ');
 			if (!this.eventInfo.has(event.serialization())) {
-				console.log('subscribe write lock ');
+				//console.log('subscribe write lock ');
 				this.lock.writeLock('write lock',(release) => {
 					this.eventInfo.set(event.serialization(), new Array<string>());
 					release();
 				});
-				console.log('subscribe write unlock ');
+				//console.log('subscribe write unlock ');
 			}
-			console.log('subscribe read unlock ');
+			//console.log('subscribe read unlock ');
 			release();
 		});
 		

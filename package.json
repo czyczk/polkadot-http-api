@@ -23,7 +23,6 @@
         "eslint": "^8.10.0",
         "ts-node": "^10.4.0",
         "ts-node-dev": "^1.1.8",
-        "types": "^0.1.1",
         "typescript": "^4.5.4"
     },
     "scripts": {
