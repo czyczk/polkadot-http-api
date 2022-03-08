@@ -64,14 +64,17 @@ export class EventController implements IGroupableController {
 		}
 	}
 
-	handleSubscriptEvent = (req:Request, res:Response, next:Next) => {
+	handleSubscribeEvent = (req:Request, res:Response, next:Next) => {
 		const eventID = req.body.eventID;
 		const contrastAddress = req.body.contrastAddress;
 		const event = new EventStruct(contrastAddress, eventID);
-		console.log('handleSubscriptEvent',event.serialization());
+		if (this.eventManager.isExistKey(event)) {
+			res.send(404, 'Subscription exist ');
+			return;
+		}
 		try {
 			this.eventManager.subscribeEvent(event);
-			res.send(200, 'subscribe success');
+			res.send(200, 'Subscribe success');
 			return;
 		} catch (err) {
 			console.error(err);
@@ -79,11 +82,11 @@ export class EventController implements IGroupableController {
 		}
 	};
 
-	handleUnsubscriptEvent = (req:Request, res:Response, next:Next) => {
+	handleUnsubscribeEvent = (req:Request, res:Response, next:Next) => {
 		const eventID = req.params.eventID;
 		const contrastAddress = req.params.contrastAddress;
 		const event = new EventStruct(contrastAddress, eventID);
-		console.log('handleUnsubscriptEvent',event.serialization());
+		//console.log('handleUnsubscriptEvent',event.serialization());
 		if (!this.eventManager.isExistKey(event)) {
 			res.send(404, 'Subscription not exist ');
 			return;
@@ -100,13 +103,10 @@ export class EventController implements IGroupableController {
 	};
 
 	handleReleaseEvent = (req:Request, res:Response, next:Next) => {
-	
-		const blockNumber = req.params.blockNumber;
-		console.log(blockNumber);
 		const eventID = req.params.eventID;
 		const contrastAddress = req.params.contrastAddress;
 		const event = new EventStruct(contrastAddress, eventID);
-		console.log('handleReleaseEvent',event.serialization());
+		//console.log('handleReleaseEvent',event.serialization());
 		if (!this.eventManager.isExistKey(event)) {
 			res.send(404, 'Subscription not exist ');
 			return;
@@ -124,8 +124,8 @@ export class EventController implements IGroupableController {
 
 	prefix = '/event';
 	endpoints = [
-		new Endpoint(HTTPMethod.POST, '/subscription', [this.handleSubscriptEvent]),
-		new Endpoint(HTTPMethod.DELETE, '/subscription/:contrastAddress/:eventID', [this.handleUnsubscriptEvent]),
+		new Endpoint(HTTPMethod.POST, '/subscription', [this.handleSubscribeEvent]),
+		new Endpoint(HTTPMethod.DELETE, '/subscription/:contrastAddress/:eventID', [this.handleUnsubscribeEvent]),
 		new Endpoint(HTTPMethod.GET, '/subscription/:contrastAddress/:eventID', [this.handleReleaseEvent]),
 	];
 }

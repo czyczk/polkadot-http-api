@@ -1,10 +1,11 @@
-import { stringify } from 'querystring';
-
+import ReadWrtieLock from 'rwlock';
 class EventManager {
 	private static instance: EventManager;
 	private eventInfo;
+	private lock;
 	private constructor() {
 		this.eventInfo = new Map();
+		this.lock = new ReadWrtieLock();
 	}
 	static getInstance() {
 		if (!this.instance) {
@@ -12,37 +13,79 @@ class EventManager {
 		}
 		return this.instance;
 	}
-
 	subscribeEvent(event:EventStruct) {
-		if (!this.eventInfo.has(event.serialization())) {
-			this.eventInfo.set(event.serialization(), new Array<string>());
-		}
+		this.lock.readLock('read lock',(release) => {
+			console.log('subscribe read lock ');
+			if (!this.eventInfo.has(event.serialization())) {
+				console.log('subscribe write lock ');
+				this.lock.writeLock('write lock',(release) => {
+					this.eventInfo.set(event.serialization(), new Array<string>());
+					release();
+				});
+				console.log('subscribe write unlock ');
+			}
+			console.log('subscribe read unlock ');
+			release();
+		});
+		
 	}
 
 	unsubscribeEvent(event:EventStruct) {
-		if(this.eventInfo.has(event.serialization())) {
-			this.eventInfo.delete(event.serialization());
-		}
+		this.lock.readLock('read lock',(release) => {
+			//console.log('unsubscribe read lock ');
+			if (this.eventInfo.has(event.serialization())) {
+				//console.log('unsubscribe write lock ');
+				this.lock.writeLock('write lock',(release) => {
+					this.eventInfo.delete(event.serialization());
+					release();
+				});
+				//console.log('unsubscribe write unlock ');
+			}
+			//console.log('unsubscribe read unlock ');
+			release();
+		});
 	}
 
 	addEventInfo(event:EventStruct, eventInfo:string) {
-		if (this.eventInfo.has(event.serialization())) {
-			this.eventInfo.get(event.serialization()).push(eventInfo);
-			//console.log('yes', this.eventInfo);
-		}		
+		this.lock.readLock('read lock',(release) => {
+			//console.log('add read lock ');
+			if (this.eventInfo.has(event.serialization())) {
+				this.lock.writeLock('write lock',(release) => {
+					//console.log('add write lock ');
+					this.eventInfo.get(event.serialization()).push(eventInfo);
+					release();
+					//console.log('add write unlock ');
+				});
+			}
+			//console.log('add read unlock ');
+			release();
+		});
 	}
 
 	releaseEventInfo(event:EventStruct) {
-		if (this.eventInfo.has(JSON.stringify(event))) {
-			const info = this.eventInfo.get(JSON.stringify(event));
-			this.eventInfo.set(JSON.stringify(event), new Array<string>());
-			return info;
-		}
-		return new Array<string>();
+		let info = new Array<string>();
+		//console.log('release read lock ');
+		this.lock.readLock('read lock',(release) => {
+			if (this.eventInfo.has(event.serialization())) {
+				this.lock.writeLock('write lock',(release) => {
+					//console.log('release write lock ');
+					info = this.eventInfo.get(JSON.stringify(event));
+					this.eventInfo.set(JSON.stringify(event), new Array<string>());
+					release();
+					//console.log('release write unlock ');
+
+				});
+			}
+			//console.log('release read unlock ');
+			release();
+		});
+		return info;
 	}
+
 	isExistKey(event:EventStruct) {
 		return this.eventInfo.has(event.serialization());
 	}
+
 	getEventKeys() {
 		return this.eventInfo.keys();
 	}
