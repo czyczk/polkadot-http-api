@@ -17,10 +17,8 @@ import {
 } from './default-optional-params';
 import {
 	availableBuiltinContracts,
-	loadFlipperAbi,
-	loadFlipperWasm,
-	loadIncrementerAbi,
-	loadIncrementerWasm,
+	loadExampleAbi,
+	loadExampleWasm,
 } from './example-contracts/util';
 import { ContractInstantiationErrorResult, ContractInstantiationSuccessResult, ExplainedModuleError } from './model';
 
@@ -46,8 +44,8 @@ export class InstantiationController implements IGroupableController {
 			await this._api.isReady;
 			const unsubIfInBlock = false;
 
-			const abi = contractName === 'flipper' ? loadFlipperAbi() : loadIncrementerAbi();
-			const wasm = contractName === 'flipper' ? loadIncrementerWasm() : loadIncrementerWasm();
+			const abi = loadExampleAbi(contractName);
+			const wasm = loadExampleWasm(contractName);
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({
@@ -75,8 +73,9 @@ export class InstantiationController implements IGroupableController {
 			await this._api.isReady;
 			const unsubIfInBlock = false;
 
-			const abi = loadFlipperAbi();
-			const wasm = loadFlipperWasm();
+			const contractName = 'flipper';
+			const abi = loadExampleAbi(contractName);
+			const wasm = loadExampleWasm(contractName);
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({});
