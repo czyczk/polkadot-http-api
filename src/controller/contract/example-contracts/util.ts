@@ -1,32 +1,32 @@
 import fs from 'fs';
 
-export const loadFlipperAbi = () => {
-	const abi = fs.readFileSync('./src/controller/contract/example-contracts/flipper/metadata.json').toString();
+const mapExampleAbiPaths = new Map();
+mapExampleAbiPaths.set('flipper', './src/controller/contract/example-contracts/flipper/metadata.json');
+mapExampleAbiPaths.set('incrementer', './src/controller/contract/example-contracts/incrementer/metadata.json');
+mapExampleAbiPaths.set('struct', './src/controller/contract/example-contracts/struct/metadata.json');
+
+const mapExampleWasmPaths = new Map();
+mapExampleWasmPaths.set('flipper', './src/controller/contract/example-contracts/flipper/flipper.wasm');
+mapExampleWasmPaths.set('incrementer', './src/controller/contract/example-contracts/incrementer/incrementer.wasm');
+mapExampleWasmPaths.set('struct', './src/controller/contract/example-contracts/struct/blbc.wasm');
+
+export const loadExampleAbi = (contractName: string) => {
+	const abiPath = mapExampleAbiPaths.get(contractName);
+	if (!abiPath) {
+		throw new Error('Unknown contract name');
+	}
+
+	const abi = fs.readFileSync(abiPath).toString();
 	return abi;
 };
 
-export const loadFlipperWasm = () => {
-	const wasm = fs.readFileSync('./src/controller/contract/example-contracts/flipper/flipper.wasm');
-	return wasm;
-};
+export const loadExampleWasm = (contractName: string) => {
+	const wasmPath = mapExampleWasmPaths.get(contractName);
+	if (!wasmPath) {
+		throw new Error('Unknown contract name');
+	}
 
-export const loadIncrementerAbi = () => {
-	const abi = fs.readFileSync('./src/controller/contract/example-contracts/incrementer/metadata.json').toString();
-	return abi;
-};
-
-export const loadIncrementerWasm = () => {
-	const wasm = fs.readFileSync('./src/controller/contract/example-contracts/incrementer/incrementer.wasm');
-	return wasm;
-};
-
-export const loadStructAbi = () => {
-	const abi = fs.readFileSync('./src/controller/contract/example-contracts/struct/metadata.json').toString();
-	return abi;
-};
-
-export const loadStructWasm = () => {
-	const wasm = fs.readFileSync('./src/controller/contract/example-contracts/struct/blbc.wasm');
+	const wasm = fs.readFileSync(wasmPath);
 	return wasm;
 };
 

@@ -9,7 +9,7 @@ import errs from 'restify-errors';
 
 import { Endpoint, IGroupableController, InBlockStatus } from '../model';
 import { DEFAULT_CONTRACT_TX_GAS_LIMIT, DEFAULT_CONTRACT_TX_VALUE, DEFAULT_UNSUB_IF_IN_BLOCK } from './default-optional-params';
-import { loadIncrementerAbi, loadStructAbi } from './example-contracts/util';
+import { loadExampleAbi } from './example-contracts/util';
 import { ContractTxErrorResult, ContractTxSuccessResult, ExplainedModuleError } from './model';
 
 export class TxController implements IGroupableController {
@@ -17,7 +17,8 @@ export class TxController implements IGroupableController {
 
 	private handleTestTxShouldSucceed = async (req: Request, res: Response, next: Next) => {
 		try {
-			const abi = loadIncrementerAbi();
+			const contractName = 'flipper';
+			const abi = loadExampleAbi(contractName);
 			const address = '5CVxfpAARVp1XEv9EvcyQkA6BgumMAVTe1uusQbo5mTx14GE';
 			const signerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 			const signerAccount = this._keyring.getPair(signerAddress);
@@ -48,7 +49,8 @@ export class TxController implements IGroupableController {
 
 	private handleTestCreatingStructShouldSucceed = async (req: Request, res: Response, next: Next) => {
 		try {
-			const abi = loadStructAbi();
+			const contractName = 'struct';
+			const abi = loadExampleAbi(contractName);
 			const address = '5EUXgbdJeoR4yTYYYuTXW9ebH74hmzUawsrE1EDWw4YJH7e1';
 			const signerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
 			const signerAccount = this._keyring.getPair(signerAddress);
