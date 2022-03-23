@@ -38,7 +38,7 @@ export class TxController implements IGroupableController {
 			const extrinsicHash = extrinsic.hash.toHex();
 			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
 			const mutablePack = new MutableStatusPack();
-			const unsub = await extrinsic.signAndSend(signerAccount, (result: ContractSubmittableResult) => {
+			const unsub = await extrinsic.signAndSend(signerAccount, { nonce: -1 }, (result: ContractSubmittableResult) => {
 				this._txResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
@@ -87,7 +87,7 @@ export class TxController implements IGroupableController {
 			const extrinsicHash = extrinsic.hash.toHex();
 			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
 			const mutablePack = new MutableStatusPack();
-			const unsub = await extrinsic.signAndSend(signerAccount, (result: ContractSubmittableResult) => {
+			const unsub = await extrinsic.signAndSend(signerAccount, { nonce: -1 }, (result: ContractSubmittableResult) => {
 				this._txResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
@@ -174,7 +174,7 @@ export class TxController implements IGroupableController {
 			const extrinsicHash = extrinsic.hash.toHex();
 			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
 			const mutablePack = new MutableStatusPack();
-			const unsub = await extrinsic.signAndSend(signerAccount, (result: ContractSubmittableResult) => {
+			const unsub = await extrinsic.signAndSend(signerAccount, { nonce: -1 }, (result: ContractSubmittableResult) => {
 				this._txResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
 			});
 		} catch (err) {
