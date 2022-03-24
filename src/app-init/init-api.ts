@@ -1,10 +1,13 @@
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 
+import { subscribableContractEventForTypes } from '../controller/model';
+
 import { ApiConfig } from './api-config';
+
 
 export const initApi = async (config: ApiConfig): Promise<InitApiResult> => {
 	const wsProvider = new WsProvider(config.nodeURL);
-	const api = new ApiPromise({ provider: wsProvider });
+	const api = await ApiPromise.create({ provider: wsProvider, types: subscribableContractEventForTypes });
 	await api.isReady;
 
 	const keyring = new Keyring({ type: config.keyringType });

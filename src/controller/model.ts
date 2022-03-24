@@ -43,3 +43,13 @@ export class TxExecutionResult {
 export class InBlockStatus {
 	constructor(public readonly inBlock: Hash, public readonly finalized?: Hash) { }
 }
+
+export class SubscribableContractEvent {
+	constructor(public eventId: string, public structId: string, ) { }
+}
+export const subscribableContractEventForTypes = {
+	SubscribableContractEvent: {
+		space: 'String',
+		eventId: 'String',
+		structId: 'String',
+	}};

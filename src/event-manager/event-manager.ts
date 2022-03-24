@@ -1,4 +1,5 @@
 import ReadWrtieLock from 'rwlock';
+import { SubscribableContractEvent } from '../controller/model';
 class EventManager {
 	private static instance: EventManager;
 	private eventInfo;
@@ -19,7 +20,7 @@ class EventManager {
 			if (!this.eventInfo.has(event.serialization())) {
 				//console.log('subscribe write lock ');
 				this.lock.writeLock('write lock',(release) => {
-					this.eventInfo.set(event.serialization(), new Array<string>());
+					this.eventInfo.set(event.serialization(), new Array<SubscribableContractEvent>());
 					release();
 				});
 				//console.log('subscribe write unlock ');
@@ -46,7 +47,7 @@ class EventManager {
 		});
 	}
 
-	addEventInfo(event:EventStruct, eventInfo:string) {
+	addEventInfo(event:EventStruct, eventInfo:SubscribableContractEvent) {
 		this.lock.readLock('read lock',(release) => {
 			//console.log('add read lock ');
 			if (this.eventInfo.has(event.serialization())) {
@@ -63,17 +64,17 @@ class EventManager {
 	}
 
 	releaseEventInfo(event:EventStruct) {
-		let info = new Array<string>();
+		let info = new Array<SubscribableContractEvent>();
 		//console.log('release read lock ');
 		this.lock.readLock('read lock',(release) => {
 			if (this.eventInfo.has(event.serialization())) {
 				this.lock.writeLock('write lock',(release) => {
 					//console.log('release write lock ');
-					info = this.eventInfo.get(JSON.stringify(event));
-					this.eventInfo.set(JSON.stringify(event), new Array<string>());
+					info = this.eventInfo.get(event.serialization());
+					console.log(JSON.stringify(info));
+					this.eventInfo.set(event.serialization(), new Array<SubscribableContractEvent>());
 					release();
 					//console.log('release write unlock ');
-
 				});
 			}
 			//console.log('release read unlock ');
@@ -91,10 +92,10 @@ class EventManager {
 	}
 }
 class EventStruct {
-	private contrastAddress:string;
+	private contractAddress:string;
 	private eventID:string;
 	constructor(contrastAddress:string, eventID:string){
-		this.contrastAddress=contrastAddress;
+		this.contractAddress=contrastAddress;
 		this.eventID = eventID;
 	}
 	public serialization() {
@@ -103,11 +104,11 @@ class EventStruct {
 
 	public static deserialization(content:string) {
 		const jsonContent = JSON.parse(content);
-		if (this.isEmpty(jsonContent['contrastAddress']) || this.isEmpty(jsonContent['contrastAddress'])) {
-			console.log('deserialization error');
+		if (this.isEmpty(jsonContent['contractAddress']) || this.isEmpty(jsonContent['eventID'])) {
+			console.log('deserialization error', jsonContent);
 			return undefined;
 		} else {
-			return new EventStruct(jsonContent['contrastAddress'],jsonContent['contrastAddress']);
+			return new EventStruct(jsonContent['contractAddress'],jsonContent['eventID']);
 		}
 	}
 
@@ -116,6 +117,14 @@ class EventStruct {
 			return true;  
 		}  
 		return false;
+	}
+
+	public getEventID(){
+		return this.eventID;
+	}
+
+	public getContractAddress() {
+		return this.contractAddress;
 	}
 
 }

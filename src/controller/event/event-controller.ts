@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import {EventManager, EventStruct} from '../../event-manager/event-manager';
-import { Endpoint, IGroupableController } from '../model';
+import { Endpoint, IGroupableController, subscribableContractEventForTypes, SubscribableContractEvent } from '../model';
 
 export class EventController implements IGroupableController {
 	private eventManager:EventManager;
@@ -13,51 +13,132 @@ export class EventController implements IGroupableController {
 	async handleGetSystemChainTest(){
 		try {
 			await this._api.isReady;
-			//const chain = await this._api.rpc.system.chain(); 
-			//const lastHeader = await this._api.rpc.chain.getHeader(); 
-			const chain = await this._api.rpc.system.chain(); 
 			this._api.rpc.beefy.subscribeJustifications;
+			// subscribe new header
 			await this._api.rpc.chain.subscribeNewHeads(async (lastHeader) => { 
 				this._api.hasSubscriptions;
-				console.log(`${chain}: last block #${lastHeader.number} has hash ${lastHeader.hash}`);
-				/**
-				 * managerEvent
-				 * headerhasp=>block
-				 * for event in Manger Event:
-				 *	manager.hashmap.get(event).append(extraction(event, block))
-				 * eventId
-				 * return hashmap.pull(hashmap.get(event))
-				 */
-				//const signedBlock = await this._api.rpc.chain.getBlock(lastHeader.hash);
-				const allRecords = await this._api.query.system.events.at(lastHeader.hash);
-				const allRecords2 = (await this._api.at(lastHeader.hash)).query.system.events;
-				// console.log('--------first');
-				// console.log(allRecords);
-				// console.log('--------second');
-				// console.log(allRecords2);
-				//console.log((await (allRecords2.events.system)));
-				//VSCode eslint
-				// signedBlock.block.extrinsics.forEach(({ method: { method, section } }, index) => {
-				// 	// filter the specific events based on the phase and then the
-				// 	// index of our extrinsic in the block
-				// 	//const phase = 'phase';
-				// 	const events = allRecords
-				// 	  .filter(({ phase }) =>
-				// 		phase.isApplyExtrinsic &&
-				// 		phase.asApplyExtrinsic.eq(index)
-				// 	  )
-				// 	  .map(({ event }) => `${event.section}.${event.method}`);
-				// eslint-disable-next-line no-mixed-spaces-and-tabs
-				  
-				// 	console.log(`${section}.${method}:: ${events.join(', ') || 'no events'}`);
-				//   });
-				for (const name of this.eventManager.getEventKeys()) {
-					const event = EventStruct.deserialization(name);
-					if (event != undefined){
-						this.eventManager.addEventInfo(event, String(lastHeader.number));
-					}
-					//this._api.query.system.events;
-				}
+				// iterate events at certain block with hash
+				// events is a list collection of event
+				await (await this._api.at(lastHeader.hash)).query.system.events((events:any)=> {
+					//console.log(events);
+					events.forEach((record:any) => {
+						/*
+						* record basic struct is a map which contain phase, event and topic
+						* phase is a map which has key "applyExtrinsic" 0 or '1'
+						* event is a map that we focus on
+						* topic is a map, but i didn't recognize the using of it.
+						*Type(3) [Map] {
+							'phase' => Type {
+								<!-- snip -->
+							},
+							'event' => Type(2) [Map] {
+								'index' => Type(2) [Uint8Array] [
+								<!-- snip -->
+								],
+								'data' => GenericEventData(1) [
+								[Type [Map]],
+								<!-- snip -->
+							},
+							'topics' => Type(0) [
+								registry: TypeRegistry { createdAtHash: undefined },
+								createdAtHash: undefined,
+								initialU8aLength: 1
+							],
+							<!-- snip -->
+							}
+						*/
+						// decompose event
+						const { event, phase } = record;
+						//console.log(event.section, event.section == 'ContractEmitted');
+						// event.section is the type of event, in this case we just focus on ContractEmitted
+						if (event.method == 'ContractEmitted') {
+							//console.log(event);
+							let contractAddress;
+							let subscribableContractEvent;
+							let eventId;
+							event.data.forEach((data:any, index:any) => {
+								// data[0] is contractAddress
+								if (index === 0) {
+									contractAddress = data.toString();
+								}
+								// data[1] is result decoded by substrate code
+								if (index === 1) {
+									const decodeResult = JSON.parse(this._api.createType('SubscribableContractEvent', data).toString());
+									//console.log(decodeResult);
+									eventId = decodeResult['eventId'];
+									subscribableContractEvent = new SubscribableContractEvent( decodeResult['eventId'], decodeResult['structId']);
+								}
+		
+							});
+							for (const eventAsString of this.eventManager.getEventKeys()) {
+								const event = EventStruct.deserialization(eventAsString);
+								if (event!=undefined && subscribableContractEvent) {
+									if(event.getContractAddress() == contractAddress && event.getEventID() == eventId) {
+										// console.log(subscribableContractEvent);
+										this.eventManager.addEventInfo(event, subscribableContractEvent);
+									}
+								}
+							}
+						}
+						
+					});
+				});
+				// console.log(this._api.createType('Uint8Array', allRecords2).toHuman());
+				//console.log(stringAllRecords2);
+				// stringAllRecords2.forEach((event:any)=>{
+				// 	if (event.event.method == 'ContractEmitted') {
+				// 		console.log(event.event.data);
+				// 		console.log(this._api.createType('Uint8Array', event.event.data[1]).toHuman());
+
+				// 	}
+				// });
+				//console.log(typeof allRecords2.toHuman());
+				//console.log(allRecords2.toHuman()?.toLocaleString());
+				// (await this._api.at(lastHeader.hash)).query.system.events((events: any[])=>{
+				// 	events.forEach((record: any) => {
+				// 		//console.log('hello');
+				// 		//console.log(record);
+				// 		const {event, phase} = record;
+				// 		//console.log(event.section, event.method);
+				// 		if (event.method === 'ContractEmitted') {
+				// 			event.data.forEach((dataItem:any) => {
+				// 				console.log(typeof dataItem);
+				// 				console.log(dataItem);
+							
+				// 			});
+				// 		}
+				// 		//console.log(phase);
+				// 	});
+					
+				// });
+				// for (const item of stringAllRecords) {
+				// 	//console.log(item);
+				// 	// const eventID = item.event.method;
+				// 	//console.log(eventID, event.getEventID(), event.getEventID() == eventID);
+				// 	console.log(typeof item.event.data,item.event.data);
+				// 	for (const i of item.event.data) {
+				// 		console.log(typeof i,i);
+				// 	}
+				// }
+				// for (const name of this.eventManager.getEventKeys()) {
+				// 	const event = EventStruct.deserialization(name);
+				// 	//console.log(event);
+				// 	if (event != undefined){
+				// 		for (const item of stringAllRecords) {
+				// 			//console.log(item);
+				// 			const eventID = item.event.method;
+				// 			//console.log(eventID, event.getEventID(), event.getEventID() == eventID);
+				// 			if (event.getEventID() == eventID) {
+				// 				//console.log(item.event.data, event.getContractAddress(), item.event.data.indexOf(event.getContractAddress()));
+				// 				if (item.event.data.indexOf(event.getContractAddress()) != -1) {
+				// 					//console.log(item, event);
+				// 					this.eventManager.addEventInfo(event, JSON.stringify(item));
+				// 				}
+				// 			}
+				// 		}	
+				// 	}
+				// 	//this._api.query.system.events;
+				// }
 			});
 		} catch (err) {
 			console.error(err);
@@ -66,8 +147,8 @@ export class EventController implements IGroupableController {
 
 	handleSubscribeEvent = (req:Request, res:Response, next:Next) => {
 		const eventID = req.body.eventID;
-		const contrastAddress = req.body.contrastAddress;
-		const event = new EventStruct(contrastAddress, eventID);
+		const contractAddress = req.body.contractAddress;
+		const event = new EventStruct(contractAddress, eventID);
 		if (this.eventManager.isExistKey(event)) {
 			res.send(404, 'Subscription exist ');
 			return;
@@ -84,8 +165,8 @@ export class EventController implements IGroupableController {
 
 	handleUnsubscribeEvent = (req:Request, res:Response, next:Next) => {
 		const eventID = req.params.eventID;
-		const contrastAddress = req.params.contrastAddress;
-		const event = new EventStruct(contrastAddress, eventID);
+		const contractAddress = req.params.contractAddress;
+		const event = new EventStruct(contractAddress, eventID);
 		//console.log('handleUnsubscriptEvent',event.serialization());
 		if (!this.eventManager.isExistKey(event)) {
 			res.send(404, 'Subscription not exist ');
@@ -104,8 +185,8 @@ export class EventController implements IGroupableController {
 
 	handleReleaseEvent = (req:Request, res:Response, next:Next) => {
 		const eventID = req.params.eventID;
-		const contrastAddress = req.params.contrastAddress;
-		const event = new EventStruct(contrastAddress, eventID);
+		const contractAddress = req.params.contractAddress;
+		const event = new EventStruct(contractAddress, eventID);
 		//console.log('handleReleaseEvent',event.serialization());
 		if (!this.eventManager.isExistKey(event)) {
 			res.send(404, 'Subscription not exist ');
@@ -113,6 +194,7 @@ export class EventController implements IGroupableController {
 		}
 		try {
 			const result = this.eventManager.releaseEventInfo(event);
+			console.log(result);
 			// 404
 			res.send(200, result);
 			return;
@@ -122,10 +204,21 @@ export class EventController implements IGroupableController {
 		}
 	};
 
+	handleBlockTest = async (req:Request, res:Response, next:Next) => {
+		const hash = req.body.hash;
+		const blockHash = await this._api.rpc.chain.getBlockHash(1);
+		const signedBlock = await this._api.rpc.chain.getBlock(blockHash);
+		const allRecords = await (await this._api.at(blockHash)).query.system.events();
+		
+		res.send(200,'');
+		return ;
+	};
+
 	prefix = '/event';
 	endpoints = [
 		new Endpoint(HTTPMethod.POST, '/subscription', [this.handleSubscribeEvent]),
-		new Endpoint(HTTPMethod.DELETE, '/subscription/:contrastAddress/:eventID', [this.handleUnsubscribeEvent]),
-		new Endpoint(HTTPMethod.GET, '/subscription/:contrastAddress/:eventID', [this.handleReleaseEvent]),
+		new Endpoint(HTTPMethod.DELETE, '/subscription/:contractAddress/:eventID', [this.handleUnsubscribeEvent]),
+		new Endpoint(HTTPMethod.GET, '/subscription/:contractAddress/:eventID', [this.handleReleaseEvent]),
+		new Endpoint(HTTPMethod.POST, '/getBlock', [this.handleBlockTest]),
 	];
 }
