@@ -71,7 +71,6 @@ class EventManager {
 				this.lock.writeLock('write lock',(release) => {
 					//console.log('release write lock ');
 					info = this.eventInfo.get(event.serialization());
-					console.log(JSON.stringify(info));
 					this.eventInfo.set(event.serialization(), new Array<SubscribableContractEvent>());
 					release();
 					//console.log('release write unlock ');
