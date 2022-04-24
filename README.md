@@ -50,6 +50,9 @@ The column of Polkadot JS API is sorted in alphabetical order (except the ping A
 |`code.tx.<constructor>`|POST|`/contract/from-code`|`abi`, `wasm`, `signerAddress`, `ctorFuncName`, `ctorArgs`|`gasLimit`, `salt`, `value`, `unsubIfInBlock`|
 |`contract.query.<funcName>`|POST|`/contract/query`|`abi`, `contractAddress`, `callerAddress`, `funcName`, `funcArgs`|`gasLimit`|
 |`contract.tx.<funcName>`|POST|`/contract/tx`|`abi`, `contractAddress`, `signerAddress`, `funcName`, `funcArgs`|`gasLimit`, `unsubIfInBlock`|
+|N/A|POST|`/event/subscription`|`contractAddress`, `eventId`||
+|N/A|GET|`/event/subscription/:contractAddress/:eventId`|||
+|N/A|DELETE|`/event/subscription/:contractAddress/:eventId`|||
 |`keyring.addFromUri`|POST|`/keyring/from-uri`|`phrase`|`meta`|
 |`keyring.getPair`|GET|`/keyring/pair/:address`|||
 
@@ -294,3 +297,19 @@ An example is as below:
     }
 }
 ```
+
+## Subscribe to Contract Events
+
+Corresponding APIs are those starting with `/event/subscription`. This functionality is not provided by the original JS API.  
+By specifying `contractAddress` and `eventId`, one can subscribe to events emmitted from an ink! contract instance with address `contractAddress` and receive any event with the following constraints.
+
+1. The event emmitted from the contract must be of the following form as defined in [`SubscribableContractEvent`](./src/event-manager/event-manager.ts#120).
+
+```
+{
+    event_id: String,
+    message: String,
+}
+```
+
+2. The `event_id` of the event must be equivalent to the specified parameter `eventId`. In other words, the parameter `eventId` acts as a filter that does its job to ignore other events emmitted from the same contract instance.
