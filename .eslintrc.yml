@@ -24,3 +24,8 @@ rules:
   semi:
     - error
     - always
+  spaced-comment:
+    - error
+    - always
+  switch-colon-spacing:
+    - error
