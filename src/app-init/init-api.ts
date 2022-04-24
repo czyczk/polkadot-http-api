@@ -1,9 +1,7 @@
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 
-import { subscribableContractEventForTypes } from '../controller/model';
-
+import { subscribableContractEventForTypes } from '../event-manager/event-manager';
 import { ApiConfig } from './api-config';
-
 
 export const initApi = async (config: ApiConfig): Promise<InitApiResult> => {
 	const wsProvider = new WsProvider(config.nodeURL);
