@@ -15,6 +15,7 @@ import { InstantiationController } from './controller/contract/instantiation-con
 import { QueryController as ContractQueryController } from './controller/contract/query-controller';
 import { TxController as ContractTxController } from './controller/contract/tx-controller';
 import { TopLevelController as KeyringTopLevelController } from './controller/keyring/top-level-controller';
+import { EventController } from './controller/event/event-controller';
 
 // Init API
 (async () => {
@@ -40,6 +41,7 @@ import { TopLevelController as KeyringTopLevelController } from './controller/ke
 		.withController(new ContractQueryController(api))
 		.withController(new ContractTxController(api, keyring))
 		.withController(new KeyringTopLevelController(api, keyring))
+		.withController(new EventController(api))
 		.getConfig();
 	const server = initServer(serverConfig);
 
