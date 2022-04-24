@@ -12,10 +12,10 @@ export class EventController implements IGroupableController {
 
 	constructor(private readonly _api: ApiPromise) {
 		this._eventManager = EventManager.getInstance();
-		this.handleGetSystemChainTest();
+		this.chainEventListenerWorkerFunc();
 	}
 
-	async handleGetSystemChainTest() {
+	async chainEventListenerWorkerFunc() {
 		try {
 			await this._api.isReady;
 			// Subscribe new headers to listen new events emmitted from now
