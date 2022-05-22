@@ -2,7 +2,6 @@ import { ApiPromise, Keyring } from '@polkadot/api';
 import { ContractPromise } from '@polkadot/api-contract';
 import { ContractSubmittableResult } from '@polkadot/api-contract/base/Contract';
 import { Hash } from '@polkadot/types/interfaces';
-import BN from 'bn.js';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import errs from 'restify-errors';
@@ -26,11 +25,11 @@ export class TxController implements IGroupableController {
 			await this._api.isReady;
 			const contract = new ContractPromise(this._api, abi, address);
 			const value = DEFAULT_CONTRACT_TX_VALUE;
-			//const gasLimit = 3_000_000_000;
+			// const gasLimit = 3_000_000_000;
 			const gasLimit = DEFAULT_CONTRACT_TX_GAS_LIMIT;
 			const unsubIfInBlock = true;
 
-			//const extrinsic = contract.tx['incAndEmitEventAndFail']({
+			// const extrinsic = contract.tx['incAndEmitEventAndFail']({
 			const extrinsic = contract.tx['incAndReturnValue']({
 				gasLimit: gasLimit,
 				value: value,
@@ -58,7 +57,7 @@ export class TxController implements IGroupableController {
 			await this._api.isReady;
 			const contract = new ContractPromise(this._api, abi, address);
 			const value = DEFAULT_CONTRACT_TX_VALUE;
-			//const gasLimit = 3_000_000_000;
+			// const gasLimit = 3_000_000_000;
 			const gasLimit = DEFAULT_CONTRACT_TX_GAS_LIMIT;
 			const unsubIfInBlock = true;
 
@@ -209,7 +208,7 @@ export class TxController implements IGroupableController {
 
 				// Get the explanation for the error
 				const moduleError = result.dispatchError.asModule;
-				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+				const metaError = this._api.registry.findMetaError(moduleError);
 
 				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 				const ret = new ContractTxErrorResult(readonlyPack.extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));

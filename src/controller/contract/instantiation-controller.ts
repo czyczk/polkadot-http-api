@@ -2,7 +2,6 @@ import { ApiPromise, Keyring } from '@polkadot/api';
 import { CodePromise } from '@polkadot/api-contract';
 import { AccountId, Hash } from '@polkadot/types/interfaces';
 import { ISubmittableResult } from '@polkadot/types/types';
-import BN from 'bn.js';
 import fs from 'fs';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
@@ -42,7 +41,10 @@ export class InstantiationController implements IGroupableController {
 			const signerAccount = this._keyring.getPair('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
 
 			await this._api.isReady;
-			const unsubIfInBlock = false;
+			// Since around substrate-contract-node v0.13, the default block behavior for 
+			// nodes running in dev mode is that blocks will never get finalized.
+			// Hence, if the following boolean is `false`, it'll make the API wait forever.
+			const unsubIfInBlock = true;
 
 			const abi = loadExampleAbi(contractName);
 			const wasm = loadExampleWasm(contractName);
@@ -233,7 +235,7 @@ export class InstantiationController implements IGroupableController {
 
 				// Get the explanation for the error
 				const moduleError = result.dispatchError.asModule;
-				const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+				const metaError = this._api.registry.findMetaError(moduleError);
 
 				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 				const ret = new ContractInstantiationErrorResult(readonlyPack.extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));

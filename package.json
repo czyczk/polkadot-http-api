@@ -6,8 +6,8 @@
     "author": "Zenas Chen <czyczk@qq.com>",
     "license": "MIT",
     "dependencies": {
-        "@polkadot/api": "^7.7.1",
-        "@polkadot/api-contract": "^7.7.1",
+        "@polkadot/api": "^8.4.2",
+        "@polkadot/api-contract": "^8.4.2",
         "http-method-enum": "^1.0.0",
         "restify": "^8.6.0",
         "restify-errors": "^8.0.2",
@@ -20,6 +20,7 @@
         "@types/rwlock": "^5.0.3",
         "@typescript-eslint/eslint-plugin": "^5.8.0",
         "@typescript-eslint/parser": "^5.8.0",
+        "@polkadot/types-known": "^8.4.2",
         "eslint": "^8.10.0",
         "ts-node": "^10.4.0",
         "ts-node-dev": "^1.1.8",

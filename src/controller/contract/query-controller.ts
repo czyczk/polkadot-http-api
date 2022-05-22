@@ -1,7 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { ContractPromise } from '@polkadot/api-contract';
 import { ContractCallOutcome } from '@polkadot/api-contract/types';
-import BN from 'bn.js';
 import HTTPMethod from 'http-method-enum';
 import { Next, Request, Response } from 'restify';
 import errs from 'restify-errors';
@@ -153,7 +152,7 @@ export class QueryController implements IGroupableController {
 
 			// Get the explanation for the error
 			const moduleError = queryError.asModule;
-			const metaError = this._api.registry.findMetaError({ index: new BN(moduleError.index), error: new BN(moduleError.error) });
+			const metaError = this._api.registry.findMetaError(moduleError);
 
 			const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
 			const ret = new ContractQueryErrorResult(explainedDispatchError, callOutcome.debugMessage.toString(), callOutcome.gasConsumed.toNumber());
