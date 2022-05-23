@@ -1,11 +1,11 @@
 {
   "source": {
-    "hash": "0x01e38c265db9c6ab03d2216334513e5b20ac508c3790f31642ac3b31096b86a0",
-    "language": "ink! 3.0.0-rc8",
-    "compiler": "rustc 1.60.0-nightly"
+    "hash": "0xd0a444dc866ed63e6c108146cbacc90f65781e64371828548deee44e6a3bf6ec",
+    "language": "ink! 3.1.0",
+    "compiler": "rustc 1.63.0-nightly"
   },
   "contract": {
-    "name": "blbc",
+    "name": "structcontract",
     "version": "0.1.0",
     "authors": [
       "[your_name] <[your_email]>"
@@ -34,7 +34,7 @@
                 "displayName": [
                   "String"
                 ],
-                "type": 3
+                "type": 1
               }
             },
             {
@@ -45,7 +45,7 @@
                 "displayName": [
                   "String"
                 ],
-                "type": 3
+                "type": 1
               }
             }
           ],
@@ -62,7 +62,7 @@
                 "displayName": [
                   "Inner"
                 ],
-                "type": 7
+                "type": 3
               }
             },
             {
@@ -71,7 +71,7 @@
                 "displayName": [
                   "Option"
                 ],
-                "type": 13
+                "type": 11
               }
             }
           ],
@@ -83,7 +83,7 @@
             "displayName": [
               "Result"
             ],
-            "type": 14
+            "type": 12
           },
           "selector": "0xc5330adb"
         },
@@ -95,7 +95,7 @@
                 "displayName": [
                   "Outer"
                 ],
-                "type": 6
+                "type": 2
               }
             },
             {
@@ -104,7 +104,7 @@
                 "displayName": [
                   "Option"
                 ],
-                "type": 13
+                "type": 11
               }
             }
           ],
@@ -116,7 +116,7 @@
             "displayName": [
               "Result"
             ],
-            "type": 14
+            "type": 12
           },
           "selector": "0xd5ca8614"
         },
@@ -128,7 +128,7 @@
                 "displayName": [
                   "String"
                 ],
-                "type": 3
+                "type": 1
               }
             }
           ],
@@ -140,7 +140,7 @@
             "displayName": [
               "Result"
             ],
-            "type": 16
+            "type": 14
           },
           "selector": "0x11b81834"
         },
@@ -152,7 +152,7 @@
                 "displayName": [
                   "String"
                 ],
-                "type": 3
+                "type": 1
               }
             }
           ],
@@ -164,9 +164,33 @@
             "displayName": [
               "Result"
             ],
-            "type": 17
+            "type": 15
           },
           "selector": "0x57c417ac"
+        },
+        {
+          "args": [
+            {
+              "label": "shape",
+              "type": {
+                "displayName": [
+                  "Shape"
+                ],
+                "type": 16
+              }
+            }
+          ],
+          "docs": [],
+          "label": "determine_shape",
+          "mutates": false,
+          "payable": false,
+          "returnType": {
+            "displayName": [
+              "String"
+            ],
+            "type": 1
+          },
+          "selector": "0x5447152f"
         }
       ]
     },
@@ -175,160 +199,18 @@
         "fields": [
           {
             "layout": {
-              "struct": {
-                "fields": [
-                  {
-                    "layout": {
-                      "struct": {
-                        "fields": [
-                          {
-                            "layout": {
-                              "cell": {
-                                "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
-                                "ty": 0
-                              }
-                            },
-                            "name": "header"
-                          },
-                          {
-                            "layout": {
-                              "struct": {
-                                "fields": [
-                                  {
-                                    "layout": {
-                                      "cell": {
-                                        "key": "0x0100000000000000000000000000000000000000000000000000000000000000",
-                                        "ty": 1
-                                      }
-                                    },
-                                    "name": "len"
-                                  },
-                                  {
-                                    "layout": {
-                                      "array": {
-                                        "cellsPerElem": 1,
-                                        "layout": {
-                                          "cell": {
-                                            "key": "0x0100000001000000000000000000000000000000000000000000000000000000",
-                                            "ty": 2
-                                          }
-                                        },
-                                        "len": 4294967295,
-                                        "offset": "0x0200000000000000000000000000000000000000000000000000000000000000"
-                                      }
-                                    },
-                                    "name": "elems"
-                                  }
-                                ]
-                              }
-                            },
-                            "name": "entries"
-                          }
-                        ]
-                      }
-                    },
-                    "name": "keys"
-                  },
-                  {
-                    "layout": {
-                      "hash": {
-                        "layout": {
-                          "cell": {
-                            "key": "0x0200000001000000000000000000000000000000000000000000000000000000",
-                            "ty": 5
-                          }
-                        },
-                        "offset": "0x0100000001000000000000000000000000000000000000000000000000000000",
-                        "strategy": {
-                          "hasher": "Blake2x256",
-                          "postfix": "",
-                          "prefix": "0x696e6b20686173686d6170"
-                        }
-                      }
-                    },
-                    "name": "values"
-                  }
-                ]
+              "cell": {
+                "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "ty": 0
               }
             },
             "name": "res_outer_map"
           },
           {
             "layout": {
-              "struct": {
-                "fields": [
-                  {
-                    "layout": {
-                      "struct": {
-                        "fields": [
-                          {
-                            "layout": {
-                              "cell": {
-                                "key": "0x0200000001000000000000000000000000000000000000000000000000000000",
-                                "ty": 0
-                              }
-                            },
-                            "name": "header"
-                          },
-                          {
-                            "layout": {
-                              "struct": {
-                                "fields": [
-                                  {
-                                    "layout": {
-                                      "cell": {
-                                        "key": "0x0300000001000000000000000000000000000000000000000000000000000000",
-                                        "ty": 1
-                                      }
-                                    },
-                                    "name": "len"
-                                  },
-                                  {
-                                    "layout": {
-                                      "array": {
-                                        "cellsPerElem": 1,
-                                        "layout": {
-                                          "cell": {
-                                            "key": "0x0300000002000000000000000000000000000000000000000000000000000000",
-                                            "ty": 2
-                                          }
-                                        },
-                                        "len": 4294967295,
-                                        "offset": "0x0400000001000000000000000000000000000000000000000000000000000000"
-                                      }
-                                    },
-                                    "name": "elems"
-                                  }
-                                ]
-                              }
-                            },
-                            "name": "entries"
-                          }
-                        ]
-                      }
-                    },
-                    "name": "keys"
-                  },
-                  {
-                    "layout": {
-                      "hash": {
-                        "layout": {
-                          "cell": {
-                            "key": "0x0400000002000000000000000000000000000000000000000000000000000000",
-                            "ty": 12
-                          }
-                        },
-                        "offset": "0x0300000002000000000000000000000000000000000000000000000000000000",
-                        "strategy": {
-                          "hasher": "Blake2x256",
-                          "postfix": "",
-                          "prefix": "0x696e6b20686173686d6170"
-                        }
-                      }
-                    },
-                    "name": "values"
-                  }
-                ]
+              "cell": {
+                "key": "0x0100000000000000000000000000000000000000000000000000000000000000",
+                "ty": 10
               }
             },
             "name": "res_inner_map"
@@ -344,28 +226,28 @@
             "composite": {
               "fields": [
                 {
-                  "name": "last_vacant",
-                  "type": 1,
-                  "typeName": "Index"
-                },
-                {
-                  "name": "len",
-                  "type": 1,
-                  "typeName": "u32"
-                },
-                {
-                  "name": "len_entries",
-                  "type": 1,
-                  "typeName": "u32"
+                  "name": "offset_key",
+                  "type": 7,
+                  "typeName": "Key"
                 }
               ]
             }
           },
+          "params": [
+            {
+              "name": "K",
+              "type": 1
+            },
+            {
+              "name": "V",
+              "type": 2
+            }
+          ],
           "path": [
             "ink_storage",
-            "collections",
-            "stash",
-            "Header"
+            "lazy",
+            "mapping",
+            "Mapping"
           ]
         }
       },
@@ -373,7 +255,7 @@
         "id": 1,
         "type": {
           "def": {
-            "primitive": "u32"
+            "primitive": "str"
           }
         }
       },
@@ -381,42 +263,36 @@
         "id": 2,
         "type": {
           "def": {
-            "variant": {
-              "variants": [
+            "composite": {
+              "fields": [
                 {
-                  "fields": [
-                    {
-                      "type": 4,
-                      "typeName": "VacantEntry"
-                    }
-                  ],
-                  "index": 0,
-                  "name": "Vacant"
+                  "name": "id",
+                  "type": 1,
+                  "typeName": "String"
                 },
                 {
-                  "fields": [
-                    {
-                      "type": 3,
-                      "typeName": "T"
-                    }
-                  ],
-                  "index": 1,
-                  "name": "Occupied"
+                  "name": "inner",
+                  "type": 3,
+                  "typeName": "Inner"
+                },
+                {
+                  "name": "my_inner",
+                  "type": 3,
+                  "typeName": "Inner"
+                },
+                {
+                  "name": "extensions",
+                  "type": 4,
+                  "typeName": "BTreeMap<String, String>"
                 }
               ]
             }
           },
-          "params": [
-            {
-              "name": "T",
-              "type": 3
-            }
-          ],
           "path": [
-            "ink_storage",
-            "collections",
-            "stash",
-            "Entry"
+            "structcontract",
+            "model",
+            "data",
+            "Outer"
           ]
         }
       },
@@ -424,8 +300,32 @@
         "id": 3,
         "type": {
           "def": {
-            "primitive": "str"
-          }
+            "composite": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": 1,
+                  "typeName": "String"
+                },
+                {
+                  "name": "value",
+                  "type": 1,
+                  "typeName": "String"
+                },
+                {
+                  "name": "my_value",
+                  "type": 1,
+                  "typeName": "String"
+                }
+              ]
+            }
+          },
+          "path": [
+            "structcontract",
+            "model",
+            "data",
+            "Inner"
+          ]
         }
       },
       {
@@ -435,23 +335,23 @@
             "composite": {
               "fields": [
                 {
-                  "name": "next",
-                  "type": 1,
-                  "typeName": "Index"
-                },
-                {
-                  "name": "prev",
-                  "type": 1,
-                  "typeName": "Index"
+                  "type": 5
                 }
               ]
             }
           },
+          "params": [
+            {
+              "name": "K",
+              "type": 1
+            },
+            {
+              "name": "V",
+              "type": 1
+            }
+          ],
           "path": [
-            "ink_storage",
-            "collections",
-            "stash",
-            "VacantEntry"
+            "BTreeMap"
           ]
         }
       },
@@ -459,75 +359,21 @@
         "id": 5,
         "type": {
           "def": {
-            "composite": {
-              "fields": [
-                {
-                  "name": "value",
-                  "type": 6,
-                  "typeName": "V"
-                },
-                {
-                  "name": "key_index",
-                  "type": 1,
-                  "typeName": "KeyIndex"
-                }
-              ]
-            }
-          },
-          "params": [
-            {
-              "name": "V",
+            "sequence": {
               "type": 6
             }
-          ],
-          "path": [
-            "ink_storage",
-            "collections",
-            "hashmap",
-            "ValueEntry"
-          ]
+          }
         }
       },
       {
         "id": 6,
         "type": {
           "def": {
-            "composite": {
-              "fields": [
-                {
-                  "name": "id",
-                  "type": 3,
-                  "typeName": "String"
-                },
-                {
-                  "name": "inner",
-                  "type": 7,
-                  "typeName": "Inner"
-                },
-                {
-                  "name": "my_inner",
-                  "type": 7,
-                  "typeName": "Inner"
-                },
-                {
-                  "name": "extensions",
-                  "type": 8,
-                  "typeName": "BTreeMap<String, String>"
-                },
-                {
-                  "name": "resource_type",
-                  "type": 11,
-                  "typeName": "ResourceType"
-                }
-              ]
-            }
-          },
-          "path": [
-            "blbc",
-            "model",
-            "data",
-            "Outer"
-          ]
+            "tuple": [
+              1,
+              1
+            ]
+          }
         }
       },
       {
@@ -537,28 +383,15 @@
             "composite": {
               "fields": [
                 {
-                  "name": "id",
-                  "type": 3,
-                  "typeName": "String"
-                },
-                {
-                  "name": "value",
-                  "type": 3,
-                  "typeName": "String"
-                },
-                {
-                  "name": "my_value",
-                  "type": 3,
-                  "typeName": "String"
+                  "type": 8,
+                  "typeName": "[u8; 32]"
                 }
               ]
             }
           },
           "path": [
-            "blbc",
-            "model",
-            "data",
-            "Inner"
+            "ink_primitives",
+            "Key"
           ]
         }
       },
@@ -566,36 +399,18 @@
         "id": 8,
         "type": {
           "def": {
-            "composite": {
-              "fields": [
-                {
-                  "type": 9
-                }
-              ]
+            "array": {
+              "len": 32,
+              "type": 9
             }
-          },
-          "params": [
-            {
-              "name": "K",
-              "type": 3
-            },
-            {
-              "name": "V",
-              "type": 3
-            }
-          ],
-          "path": [
-            "BTreeMap"
-          ]
+          }
         }
       },
       {
         "id": 9,
         "type": {
           "def": {
-            "sequence": {
-              "type": 10
-            }
+            "primitive": "u8"
           }
         }
       },
@@ -603,77 +418,36 @@
         "id": 10,
         "type": {
           "def": {
-            "tuple": [
-              3,
-              3
-            ]
-          }
-        }
-      },
-      {
-        "id": 11,
-        "type": {
-          "def": {
-            "variant": {
-              "variants": [
-                {
-                  "index": 0,
-                  "name": "Plain"
-                },
-                {
-                  "index": 1,
-                  "name": "Encrypted"
-                },
-                {
-                  "index": 2,
-                  "name": "Offchain"
-                }
-              ]
-            }
-          },
-          "path": [
-            "blbc",
-            "model",
-            "data",
-            "ResourceType"
-          ]
-        }
-      },
-      {
-        "id": 12,
-        "type": {
-          "def": {
             "composite": {
               "fields": [
                 {
-                  "name": "value",
+                  "name": "offset_key",
                   "type": 7,
-                  "typeName": "V"
-                },
-                {
-                  "name": "key_index",
-                  "type": 1,
-                  "typeName": "KeyIndex"
+                  "typeName": "Key"
                 }
               ]
             }
           },
           "params": [
             {
+              "name": "K",
+              "type": 1
+            },
+            {
               "name": "V",
-              "type": 7
+              "type": 3
             }
           ],
           "path": [
             "ink_storage",
-            "collections",
-            "hashmap",
-            "ValueEntry"
+            "lazy",
+            "mapping",
+            "Mapping"
           ]
         }
       },
       {
-        "id": 13,
+        "id": 11,
         "type": {
           "def": {
             "variant": {
@@ -685,7 +459,7 @@
                 {
                   "fields": [
                     {
-                      "type": 3
+                      "type": 1
                     }
                   ],
                   "index": 1,
@@ -697,12 +471,62 @@
           "params": [
             {
               "name": "T",
-              "type": 3
+              "type": 1
             }
           ],
           "path": [
             "Option"
           ]
+        }
+      },
+      {
+        "id": 12,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 13
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 1
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 13
+            },
+            {
+              "name": "E",
+              "type": 1
+            }
+          ],
+          "path": [
+            "Result"
+          ]
+        }
+      },
+      {
+        "id": 13,
+        "type": {
+          "def": {
+            "tuple": []
+          }
         }
       },
       {
@@ -714,7 +538,7 @@
                 {
                   "fields": [
                     {
-                      "type": 15
+                      "type": 3
                     }
                   ],
                   "index": 0,
@@ -723,7 +547,7 @@
                 {
                   "fields": [
                     {
-                      "type": 3
+                      "type": 1
                     }
                   ],
                   "index": 1,
@@ -735,11 +559,11 @@
           "params": [
             {
               "name": "T",
-              "type": 15
+              "type": 3
             },
             {
               "name": "E",
-              "type": 3
+              "type": 1
             }
           ],
           "path": [
@@ -751,8 +575,42 @@
         "id": 15,
         "type": {
           "def": {
-            "tuple": []
-          }
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 2
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 1
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 2
+            },
+            {
+              "name": "E",
+              "type": 1
+            }
+          ],
+          "path": [
+            "Result"
+          ]
         }
       },
       {
@@ -764,36 +622,31 @@
                 {
                   "fields": [
                     {
-                      "type": 7
+                      "type": 17,
+                      "typeName": "Circle"
                     }
                   ],
                   "index": 0,
-                  "name": "Ok"
+                  "name": "Circle"
                 },
                 {
                   "fields": [
                     {
-                      "type": 3
+                      "type": 19,
+                      "typeName": "Rectangle"
                     }
                   ],
                   "index": 1,
-                  "name": "Err"
+                  "name": "Rectangle"
                 }
               ]
             }
           },
-          "params": [
-            {
-              "name": "T",
-              "type": 7
-            },
-            {
-              "name": "E",
-              "type": 3
-            }
-          ],
           "path": [
-            "Result"
+            "structcontract",
+            "model",
+            "data",
+            "Shape"
           ]
         }
       },
@@ -801,41 +654,56 @@
         "id": 17,
         "type": {
           "def": {
-            "variant": {
-              "variants": [
+            "composite": {
+              "fields": [
                 {
-                  "fields": [
-                    {
-                      "type": 6
-                    }
-                  ],
-                  "index": 0,
-                  "name": "Ok"
-                },
-                {
-                  "fields": [
-                    {
-                      "type": 3
-                    }
-                  ],
-                  "index": 1,
-                  "name": "Err"
+                  "name": "radius",
+                  "type": 18,
+                  "typeName": "i64"
                 }
               ]
             }
           },
-          "params": [
-            {
-              "name": "T",
-              "type": 6
-            },
-            {
-              "name": "E",
-              "type": 3
-            }
-          ],
           "path": [
-            "Result"
+            "structcontract",
+            "model",
+            "data",
+            "Circle"
+          ]
+        }
+      },
+      {
+        "id": 18,
+        "type": {
+          "def": {
+            "primitive": "i64"
+          }
+        }
+      },
+      {
+        "id": 19,
+        "type": {
+          "def": {
+            "composite": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": 18,
+                  "typeName": "i64"
+                },
+                {
+                  "name": "y",
+                  "type": 18,
+                  "typeName": "i64"
+                }
+              ]
+            }
+          },
+          "path": [
+            "structcontract",
+            "model",
+            "data",
+            "Rectangle"
           ]
         }
       }
