@@ -92,8 +92,15 @@ export class EventController implements IGroupableController {
 	}
 
 	handleCreateSubscription = (req: Request, res: Response, next: Next) => {
+		const clientId = req.body.clientId;
 		const eventId = req.body.eventId;
 		const contractAddress = req.body.contractAddress;
+
+		if (!clientId) {
+			next(new errs.BadRequestError('Param `clientId` not specified.'));
+			return;
+		}
+
 		if (!eventId) {
 			next(new errs.BadRequestError('Param `eventId` not specified.'));
 			return;
@@ -104,10 +111,11 @@ export class EventController implements IGroupableController {
 			return;
 		}
 
-		const subscription = new Subscription(contractAddress, eventId);
+		const subscription = new Subscription(clientId, contractAddress, eventId);
 
 		if (this._eventManager.hasSubscription(subscription)) {
-			next(new errs.BadRequestError(`Subscription of contract address '${contractAddress}' and event ID '${eventId}' already exists.`));
+			res.send(303, `Subscription of client ID '${clientId}', contract address '${contractAddress}' and event ID '${eventId}' already exists.`);
+			next();
 			return;
 		}
 
@@ -122,8 +130,14 @@ export class EventController implements IGroupableController {
 	};
 
 	handleRemoveSubscription = (req: Request, res: Response, next: Next) => {
+		const clientId = req.params.clientId;
 		const eventId = req.params.eventId;
 		const contractAddress = req.params.contractAddress;
+
+		if (!clientId) {
+			next(new errs.BadRequestError('Param `clientId` not specified.'))
+			return;
+		}
 
 		if (!eventId) {
 			next(new errs.BadRequestError('Param `eventId` not specified.'));
@@ -135,7 +149,7 @@ export class EventController implements IGroupableController {
 			return;
 		}
 
-		const subscription = new Subscription(contractAddress, eventId);
+		const subscription = new Subscription(clientId, contractAddress, eventId);
 
 		if (!this._eventManager.hasSubscription(subscription)) {
 			res.send(404);
@@ -153,8 +167,14 @@ export class EventController implements IGroupableController {
 	};
 
 	handleReleaseSubscriptionEvents = (req: Request, res: Response, next: Next) => {
+		const clientId = req.params.clientId;
 		const eventId = req.params.eventId;
 		const contractAddress = req.params.contractAddress;
+
+		if (!clientId) {
+			next(new errs.BadRequestError('Param `clientId` not specified.'));
+			return;
+		}
 
 		if (!eventId) {
 			next(new errs.BadRequestError('Param `eventId` not specified.'));
@@ -166,7 +186,7 @@ export class EventController implements IGroupableController {
 			return;
 		}
 
-		const subscription = new Subscription(contractAddress, eventId);
+		const subscription = new Subscription(clientId, contractAddress, eventId);
 
 		if (!this._eventManager.hasSubscription(subscription)) {
 			res.send(404);
@@ -186,7 +206,7 @@ export class EventController implements IGroupableController {
 	prefix = '/event';
 	endpoints = [
 		new Endpoint(HTTPMethod.POST, '/subscription', [this.handleCreateSubscription]),
-		new Endpoint(HTTPMethod.DELETE, '/subscription/:contractAddress/:eventId', [this.handleRemoveSubscription]),
-		new Endpoint(HTTPMethod.GET, '/subscription/:contractAddress/:eventId', [this.handleReleaseSubscriptionEvents]),
+		new Endpoint(HTTPMethod.DELETE, '/subscription/:clientId/:contractAddress/:eventId', [this.handleRemoveSubscription]),
+		new Endpoint(HTTPMethod.GET, '/subscription/:clientId/:contractAddress/:eventId', [this.handleReleaseSubscriptionEvents]),
 	];
 }

@@ -2,7 +2,9 @@ import RWLock from 'rwlock';
 
 export class EventManager {
 	private static _instance: EventManager;
+	// subscription key -> events
 	private readonly _subscriptionEventMap: Map<string, SubscribableContractEvent[]>;
+	// subscription key -> subscription
 	private readonly _subscriptionMap: Map<string, Subscription>;
 	private readonly _lock;
 
@@ -95,7 +97,7 @@ export class EventManager {
 export class Subscription {
 	private _mapKey: string;
 
-	constructor(public readonly contractAddress: string, public readonly eventId: string) {
+	constructor(public readonly clientId: string, public readonly contractAddress: string, public readonly eventId: string) {
 		this._mapKey = JSON.stringify(this);
 	}
 
