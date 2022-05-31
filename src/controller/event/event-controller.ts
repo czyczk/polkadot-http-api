@@ -63,7 +63,12 @@ export class EventController implements IGroupableController {
 						const contractAddress = event.data[0].toString();
 						let decodedContractEvent: { [index: string]: string };
 						try {
+							console.debug('---');
+							console.debug('Received an event likely to be decodable.')
+							console.debug(event.data.toHuman());
 							decodedContractEvent = this._api.createType('SubscribableContractEvent', event.data[1]).toJSON() as ({ [index: string]: string });
+							console.debug('Decoded:');
+							console.debug(decodedContractEvent);
 						} catch (err) {
 							// If it cannot be decoded, it must be an unrecognizable contract event which should be ignored.
 							console.warn(err);
