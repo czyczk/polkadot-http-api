@@ -6,7 +6,7 @@ It covers a lot of useful APIs from not only `@polkadot/api` but also `@polkadot
 
 ## Versions
 
-`@polkadot/api` and `@polkadot/api-contract` are of version `v6.12.1`.
+`@polkadot/api` and `@polkadot/api-contract` are of version `v8.4.2`.
 
 ## Instructions
 
