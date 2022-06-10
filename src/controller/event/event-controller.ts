@@ -64,7 +64,7 @@ export class EventController implements IGroupableController {
 						let decodedContractEvent: { [index: string]: string };
 						try {
 							console.debug('---');
-							console.debug('Received an event likely to be decodable.')
+							console.debug('Received an event likely to be decodable.');
 							console.debug(event.data.toHuman());
 							decodedContractEvent = this._api.createType('SubscribableContractEvent', event.data[1]).toJSON() as ({ [index: string]: string });
 							console.debug('Decoded:');
@@ -140,7 +140,7 @@ export class EventController implements IGroupableController {
 		const contractAddress = req.params.contractAddress;
 
 		if (!clientId) {
-			next(new errs.BadRequestError('Param `clientId` not specified.'))
+			next(new errs.BadRequestError('Param `clientId` not specified.'));
 			return;
 		}
 

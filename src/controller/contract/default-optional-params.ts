@@ -1,7 +1,7 @@
 export const DEFAULT_UNSUB_IF_IN_BLOCK = true;
 export const DEFAULT_CONTRACT_INSTANTIATION_GAS_LIMIT = 200_000_000_000;
 export const DEFAULT_CONTRACT_INSTANTIATION_SALT = null;
-//export const DEFAULT_CONTRACT_INSTANTIATION_VALUE = 1_000_000_000_000_000; // OK for 6.12.x
+// export const DEFAULT_CONTRACT_INSTANTIATION_VALUE = 1_000_000_000_000_000; // OK for 6.12.x
 export const DEFAULT_CONTRACT_INSTANTIATION_VALUE = undefined; // Must be undefined for non-payable methods since 7.x. Otherwise a `contracts.ContractTrapped` withindex 8 error 10 will occur
 export const DEFAULT_CONTRACT_QUERY_GAS_LIMIT = -1;
 export const DEFAULT_CONTRACT_QUERY_VALUE = 0;

@@ -1,5 +1,6 @@
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { CodePromise } from '@polkadot/api-contract';
+import {SubmittableExtrinsic} from '@polkadot/api/types';
 import { AccountId, Hash } from '@polkadot/types/interfaces';
 import { ISubmittableResult } from '@polkadot/types/types';
 import fs from 'fs';
@@ -55,9 +56,8 @@ export class InstantiationController implements IGroupableController {
 				salt: DEFAULT_CONTRACT_INSTANTIATION_SALT,
 				value: DEFAULT_CONTRACT_INSTANTIATION_VALUE,
 			});
-			const extrinsicHash = extrinsic.hash.toHex();
 
-			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const readonlyPack = new ReadonlyStatusPack(res, next, unsubIfInBlock, extrinsic);
 			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
 				this._instantiationResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
@@ -81,9 +81,8 @@ export class InstantiationController implements IGroupableController {
 
 			const code = new CodePromise(this._api, abi, wasm);
 			const extrinsic = code.tx['default']({});
-			const extrinsicHash = extrinsic.hash.toHex();
 
-			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const readonlyPack = new ReadonlyStatusPack(res, next, unsubIfInBlock, extrinsic);
 			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
 				this._instantiationResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
@@ -194,9 +193,8 @@ export class InstantiationController implements IGroupableController {
 				salt: salt,
 				value: value,
 			}, ...ctorArgs);
-			const extrinsicHash = extrinsic.hash.toHex();
 
-			const readonlyPack = new ReadonlyStatusPack(res, next, extrinsicHash, unsubIfInBlock);
+			const readonlyPack = new ReadonlyStatusPack(res, next, unsubIfInBlock, extrinsic);
 			const mutablePack = new MutableStatusPack();
 			const unsub = await extrinsic.signAndSend(signerAccount, (result: ISubmittableResult) => {
 				this._instantiationResultCallbackFunc(unsub, result, readonlyPack, mutablePack);
@@ -238,7 +236,8 @@ export class InstantiationController implements IGroupableController {
 				const metaError = this._api.registry.findMetaError(moduleError);
 
 				const explainedDispatchError = ExplainedModuleError.fromRegistryError(moduleError.index, moduleError.error, metaError);
-				const ret = new ContractInstantiationErrorResult(readonlyPack.extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));
+				const extrinsicHash = readonlyPack.extrinsic.hash.toHex();
+				const ret = new ContractInstantiationErrorResult(extrinsicHash, explainedDispatchError, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));
 				readonlyPack.res.send(500, ret);
 				return;
 			}
@@ -261,7 +260,8 @@ export class InstantiationController implements IGroupableController {
 
 				if (readonlyPack.unsubIfInBlock) {
 					unsub();
-					const ret = new ContractInstantiationSuccessResult(mutablePack.address, readonlyPack.extrinsicHash, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));
+					const extrinsicHash = readonlyPack.extrinsic.hash.toHex();
+					const ret = new ContractInstantiationSuccessResult(mutablePack.address, extrinsicHash, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash));
 					readonlyPack.res.send(200, ret);
 					readonlyPack.next();
 					return;
@@ -275,7 +275,8 @@ export class InstantiationController implements IGroupableController {
 					// This should not happen.
 					throw new Error();
 				}
-				const ret = new ContractInstantiationSuccessResult(mutablePack.address, readonlyPack.extrinsicHash, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash, mutablePack.finalizedBlockHash));
+				const extrinsicHash = readonlyPack.extrinsic.hash.toHex();
+				const ret = new ContractInstantiationSuccessResult(mutablePack.address, extrinsicHash, result.dispatchInfo, new InBlockStatus(mutablePack.inBlockBlockHash, mutablePack.finalizedBlockHash));
 				readonlyPack.res.send(200, ret);
 				readonlyPack.next();
 				return;
@@ -306,5 +307,5 @@ class MutableStatusPack {
 }
 
 class ReadonlyStatusPack {
-	constructor(public readonly res: Response, public readonly next: Next, public readonly extrinsicHash: string, public readonly unsubIfInBlock: boolean) { }
+	constructor(public readonly res: Response, public readonly next: Next, public readonly unsubIfInBlock: boolean, public readonly extrinsic: SubmittableExtrinsic<'promise', ISubmittableResult>) { }
 }
