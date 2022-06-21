@@ -9,7 +9,7 @@ export class ApiConfig {
 		this._nodeURL = value;
 	}
 
-	private _keyringType: KeypairType = 'sr25519';
+	private _keyringType: KeypairType = 'sm2';
 	public get keyringType() {
 		return this._keyringType;
 	}

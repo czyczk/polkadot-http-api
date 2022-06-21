@@ -21,7 +21,7 @@ import { EventController } from './controller/event/event-controller';
 (async () => {
 	const apiConfig = new ApiConfigBuilder()
 		.withNodeURL('ws://localhost:9944')
-		.withKeyringType('sr25519')
+		.withKeyringType('sm2')
 		.getConfig();
 	const { api, keyring } = await initApi(apiConfig);
 

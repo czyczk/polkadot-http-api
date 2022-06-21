@@ -18,7 +18,7 @@ export class QueryController implements IGroupableController {
 			const contractName = 'flipper';
 			const abi = loadExampleAbi(contractName);
 			const address = '5G4gQtoM8aihMBnt7DmJS7aQfh3NjC54NhXLRqKPdsKu8F2H';
-			const callerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+			const callerAddress = '6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh';
 
 			await this._api.isReady;
 			const contract = new ContractPromise(this._api, abi, address);
@@ -42,7 +42,7 @@ export class QueryController implements IGroupableController {
 			const contractName = 'flipper';
 			const abi = loadExampleAbi(contractName);
 			const address = '5Cp5e1C38HtsBB4mnRFgidzxSJu3KZQLXjnrmwH4jLMEK8Lw'; // Non-existent contract address
-			const callerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+			const callerAddress = '6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh';
 
 			await this._api.isReady;
 			const contract = new ContractPromise(this._api, abi, address);

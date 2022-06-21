@@ -21,7 +21,7 @@ export class TxController implements IGroupableController {
 			const contractName = 'flipper';
 			const abi = loadExampleAbi(contractName);
 			const address = '5CVxfpAARVp1XEv9EvcyQkA6BgumMAVTe1uusQbo5mTx14GE';
-			const signerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+			const signerAddress = '6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh';
 			const signerAccount = this._keyring.getPair(signerAddress);
 
 			await this._api.isReady;
@@ -52,7 +52,7 @@ export class TxController implements IGroupableController {
 			const contractName = 'struct';
 			const abi = loadExampleAbi(contractName);
 			const address = '5EUXgbdJeoR4yTYYYuTXW9ebH74hmzUawsrE1EDWw4YJH7e1';
-			const signerAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
+			const signerAddress = '6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh';
 			const signerAccount = this._keyring.getPair(signerAddress);
 
 			await this._api.isReady;

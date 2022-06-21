@@ -261,7 +261,7 @@ An example of a successful transaction with events is as below:
     },
     "parsedContractEvents": [
         {
-            "caller": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "caller": "6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh",
             "currentValue": {
                 "ok": 1
             }

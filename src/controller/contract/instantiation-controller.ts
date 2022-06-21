@@ -39,7 +39,7 @@ export class InstantiationController implements IGroupableController {
 				return;
 			}
 
-			const signerAccount = this._keyring.getPair('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+			const signerAccount = this._keyring.getPair('6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh');
 
 			await this._api.isReady;
 			// Since around substrate-contract-node v0.13, the default block behavior for 
@@ -70,7 +70,7 @@ export class InstantiationController implements IGroupableController {
 
 	private handleTestInstantiationShouldFailDueToInsufficientFund = async (req: Request, res: Response, next: Next) => {
 		try {
-			const signerAccount = this._keyring.getPair('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+			const signerAccount = this._keyring.getPair('6VqdBno6RjCwf49F8676qRxioKknYHTFa8R5WYsKo8DXgxLXZZQdZQWtT2Zfnt71kBEBbd6gpPupWysvDjg9CnSnKBMQh');
 
 			await this._api.isReady;
 			const unsubIfInBlock = false;
