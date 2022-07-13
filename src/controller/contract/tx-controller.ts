@@ -271,8 +271,7 @@ export class TxController implements IGroupableController {
 			return;
 		}
 
-		// TODO: not covered result status
-		throw new errs.NotImplementedError(`We don't know how to handle result status of ${result.status} yet.`);
+		console.log('tx status:', result.status.toHuman());
 	};
 
 	prefix = '/contract/tx';

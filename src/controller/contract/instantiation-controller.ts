@@ -291,7 +291,7 @@ export class InstantiationController implements IGroupableController {
 			return;
 		}
 
-    console.log('tx status:', result.status.toHuman());
+		console.log('tx status:', result.status.toHuman());
 	};
 
 	prefix = '/contract';
